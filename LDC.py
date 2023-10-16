@@ -3,6 +3,8 @@ import numpy as np
 import copy
 
 
+# si ça s'affiche c est que j'ai réussi à git push# si ça s'affiche
+# c est que j'ai réussi à git push
 class team:
     def __init__(self, name, country, group, rank, drawn):
         self._name = name
