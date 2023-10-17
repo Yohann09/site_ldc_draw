@@ -1,0 +1,20 @@
+{% extends 'base.html' %}  <!-- pour utiliser le modèle parent : base-->
+
+<!-- remplace le titre orginal qui était dans base-->
+{% block title %} UCL Draw {% endblock %}
+
+{% block content %}
+    <h1>Test de création d'un formulaire:</h1>
+    <p>Texte avant le formulaire</p>
+    <form method="POST" action="/calculate">
+    <p>
+        <input type = "number" name="num" placeholder="Numérateur">
+        <input type = "number" name="denom" placeholder="Dénominateur">
+        <button type="submit">Calculer</button>
+    </p>
+</form>
+    <p>Résultat : {{ result }}</p>
+
+{% endblock %}
+
+
