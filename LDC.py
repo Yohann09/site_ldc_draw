@@ -330,7 +330,7 @@ G_init.remove("PSG", "Manchester City")
 G_init.remove("Liverpool", "Benfica")
 G_init.remove("Frankfurt", "Napoli")
 # G_init.remove("Brugge", "Bayern")
-# G_init.remove("AC Milan", "Porto")
+G_init.remove("AC Milan", "Porto")
 
 """
 S = G_init.subgraphs()    #  test
