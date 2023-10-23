@@ -38,14 +38,7 @@ class GraphBipartite:
             self._runners_up = features[1]
             self._winners = features[2]
             self._length = features[3]
-        self._dict_admissible_opponents = {}
         self.last_runner_drawn = " "
-
-    def dict_admissible_opponents(self):
-        return self._dict_admissible_opponents
-
-    def set_dict_admissible_opponents(self, admissible_opponents, runner):
-        self._dict_admissible_opponents[f"{runner}"] = admissible_opponents
 
     def graph(self):
         return self._graph
@@ -134,8 +127,6 @@ class GraphBipartite:
         self.last_runner_drawn = runner
 
     def admissible_opponents(self, runner_up):
-        if runner_up in self.dict_admissible_opponents():
-            return self.dict_admissible_opponents()[f"{runner_up}"]
         if self.length() > 2:
             admissible_opponents = {}
             for runner in self.runners_up():
@@ -169,8 +160,6 @@ class GraphBipartite:
                                     admissible_opponents[
                                         f"{runner2}"].remove(
                                             winner)
-            self.set_dict_admissible_opponents(
-                admissible_opponents[f"{runner_up}"], runner_up)
             return admissible_opponents[f"{runner_up}"]
         else:
             res = []
