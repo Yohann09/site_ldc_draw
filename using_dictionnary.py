@@ -75,8 +75,7 @@ class GraphBipartite:
         if team.name() not in self.graph():
             self.graph()[team.name()] = []
             self.graph()[team.name()].append(set)
-            self.set_length(self.length() + 1)
-
+            self.set_length(self.length()+1)
         else:
             print(f"The team {team.name()} is already in the graph.")
 
@@ -86,12 +85,10 @@ class GraphBipartite:
         if set1 is None or set2 is None:
             print("The teams are not in the graph")
             return
-
         if set1 == set2:
             print("The teams have the same rank")
             self.is_bipartite = False
             return
-
         self.add_neighbor_graph(team1.name(), team2.name())
         self.add_neighbor_graph(team2.name(), team1.name())
 
@@ -113,10 +110,8 @@ class GraphBipartite:
             del self._graph[j_0]
         else:
             print("not in dictionnary")
-
         self._runners_up.remove(i_0)
         self._winners.remove(j_0)
-
         for team in self.graph():
             if i_0 in self.graph()[team]:
                 self._graph[team].remove(i_0)
@@ -129,78 +124,6 @@ class GraphBipartite:
         self.set_length(self.length() - 1)
         self.last_runner_drawn = runner
 
-    def admissible_opponents(self, runner_up):
-        if self.length() > 2:
-            admissible_opponents = {}
-            for runner in self.runners_up():
-                admissible_opponents[f"{runner}"] = self.graph()[
-                    f"{runner}"][1:]
-                if admissible_opponents[f"{runner}"] == []:
-                    return "no opponents"
-
-                for runner in admissible_opponents:
-                    if len(admissible_opponents[f"{runner}"]) == 1:
-                        for runner2 in admissible_opponents:
-                            if runner2 == runner:
-                                continue
-                            else:
-                                if admissible_opponents[f"{runner}"][0] in \
-                                     admissible_opponents[f"{runner2}"]:
-                                    admissible_opponents[
-                                        f"{runner2}"].remove(
-                                            admissible_opponents[
-                                                f"{runner}"][0])
-                for winner in self.winners():
-                    if len(self.graph()[f"{winner}"]) == 2:
-                        admissible_opponents[self.graph()[f"{winner}"][1]] = [
-                            f"{winner}"]
-                        for runner2 in admissible_opponents:
-                            if runner2 == self.graph()[f"{winner}"][1]:
-                                continue
-                            else:
-                                if winner in admissible_opponents[
-                                     f"{runner2}"]:
-                                    admissible_opponents[
-                                        f"{runner2}"].remove(
-                                            winner)
-            return admissible_opponents[f"{runner_up}"]
-        else:
-            res = []
-            if len(self.graph()[f"{runner_up}"]) == 2:
-                res.append(self.graph()[f"{runner_up}"][1])
-            else:
-                return "prooblem"
-            return res
-
-    def subgraphs(self):
-        G = {}
-        i = self.length()
-        G[f"{i}"] = [self.copy_graph()]
-        G["trash"] = []
-        while i > 2:
-            i -= 2
-            G[f"{i}"] = []
-            s = i+2
-            for graph in G[f"{s}"]:
-                for runner_up in graph.runners_up():
-                    if type(graph.admissible_opponents(runner_up)) == str:
-                        G["trash"].append([])
-                    else:
-                        for opponent in graph.admissible_opponents(runner_up):
-                            G_3 = graph.copy_graph()
-                            G_3.remove_2t(runner_up, opponent)
-                            G[f"{i}"].append(G_3)
-        return G
-
-    def all_admissible_opponents(self):        # sert à rien pour l'instant
-        all_admissible_opponents = {}
-        for subgraph in self.subgraphs():
-            all_admissible_opponents[subgraph] = []
-            for runner in self.subgraphs()[subgraph].runners_up:
-                all_admissible_opponents[subgraph].append(self.subgraphs()[
-                    subgraph].admissible_opponents(runner))
-        return all_admissible_opponents
-
     def random_pick(self):
         index_runner_up = random.randint(0, len(self.runners_up) - 1)
         runner_up = self.runners_up()[index_runner_up]
@@ -210,45 +133,6 @@ class GraphBipartite:
         winner = admissible_opponents[index_winner]
 
         return runner_up, winner
-
-    def proba_cond(self, i, j, i_0, data):
-        adm_opp_i0 = self.admissible_opponents(i_0)
-        if self.length() > 2:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    return round(1/len(adm_opp_i0), 4)
-                else:
-                    return 0
-            else:
-                prob = 0
-                for j_0 in self.graph()[i_0][1:]:
-                    if j_0 != j and j_0 in adm_opp_i0:
-                        G_2 = self.copy_graph()
-                        G_2.remove_2t(i_0, j_0)
-                        prob += G_2.proba(i, j, data) / len(adm_opp_i0)
-                    else:
-                        prob += 0
-            return prob
-        else:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    return 1
-                else:
-                    return 0
-            else:
-                print("problem")
-
-    def proba(self, i, j, data):
-        sum = 0
-        for i_0 in self.runners_up():
-            sum += self.proba_cond(i, j, i_0)
-        return sum/len(self.runners_up())
-
-    def dictionnaire(self):
-        res = {}
-        res[f"{tuple(self.runners_up())}, {tuple(self.winners())}"] = \
-            self.matrix().tolist()
-        return res
 
     def matrix(self, data):
         table = []
@@ -266,16 +150,21 @@ class GraphBipartite:
             for j in range(0, len(runners)):
                 if self.length() % 2 == 0:
                     key2 = f"{runners[i]}, {winners[j]}"
-                    if key1 in data and key2 \
-                       in data[len(self.runners_up()) - 1][key1]:
-                        table[i + 1].append(round(
+                    if key1 in data[len(runners)-1] and key2 \
+                       in data[len(runners)-1][key1]:
+                        table[j+1].append(round(
                             data[len(self.runners_up()) - 1][
                                 key1][key2]*100, 2))
                     else:
                         print(f"not, {key1}, {key2}")
-                        table[i + 1].append(round(self.proba_cond(
-                            self.runners_up()[j - 1], self.winners()[i - 1],
-                            self.last_runner_drawn, data)*100, 2))
+                else:
+                    key2 = \
+                        f"{runners[i]}, {winners[j]}, {self.last_runner_drawn}"
+                    if key1 in data[len(runners)-1] and key2 \
+                       in data[len(runners)-1][key1]:
+                        table[j+1].append(round(
+                            data[len(self.runners_up()) - 1][
+                                key1][key2]*100, 2))
         matrix = np.array(table, dtype=object)
         return matrix
 
@@ -322,12 +211,12 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-G_init.remove_2t("Frankfurt", "Napoli")
+G_init.remove_2t("PSG", "Bayern")
 # G_init.remove_2t("Liverpool", "Chelsea")
 G_init.remove_2t("Liverpool", "Benfica")
-G_init.remove_2t("Leipzig", "Manchester City")
+# G_init.remove_2t("Leipzig", "Manchester City")
 G_init.remove_2t("AC Milan", "Porto")
-G_init.remove_2t("Brugge", "Bayern")
+G_init.remove_1t("Inter")
 
 donnees = []
 for i in range(len(G_init.runners_up())):

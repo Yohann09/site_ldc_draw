@@ -111,10 +111,8 @@ class GraphBipartite:
             del self._graph[j_0]
         else:
             print("not in dictionnary")
-
         self._runners_up.remove(i_0)
         self._winners.remove(j_0)
-
         for team in self.graph():
             if i_0 in self.graph()[team]:
                 self._graph[team].remove(i_0)
@@ -170,7 +168,7 @@ class GraphBipartite:
                 return "prooblem"
             return res
 
-    def subgraphs(self):
+    def subgraphs(self):    # sert à r
         G = {}
         i = self.length()
         G[f"{i}"] = [self.copy_graph()]
@@ -190,15 +188,6 @@ class GraphBipartite:
                             G[f"{i}"].append(G_3)
         return G
 
-    def all_admissible_opponents(self):        # sert à rien pour l'instant
-        all_admissible_opponents = {}
-        for subgraph in self.subgraphs():
-            all_admissible_opponents[subgraph] = []
-            for runner in self.subgraphs()[subgraph].runners_up:
-                all_admissible_opponents[subgraph].append(self.subgraphs()[
-                    subgraph].admissible_opponents(runner))
-        return all_admissible_opponents
-
     def random_pick(self):
         index_runner_up = random.randint(0, len(self.runners_up) - 1)
         runner_up = self.runners_up()[index_runner_up]
@@ -217,20 +206,20 @@ class GraphBipartite:
                 if j in adm_opp_i0:
                     res = round(1/len(adm_opp_i0), 4)
                     if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = res
                     else:
-                        dictionnary[len(self.runners_up()) - 1][key] = {}
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key] = {}
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = res
                     return res
                 else:
                     if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 0
                     else:
-                        dictionnary[len(self.runners_up()) - 1][key] = {}
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key] = {}
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 0
                     return 0
             else:
@@ -243,31 +232,31 @@ class GraphBipartite:
                     else:
                         prob += 0
                 if key in dictionnary[len(self.runners_up())-1]:
-                    dictionnary[len(self.runners_up()) - 1][key][
+                    dictionnary[len(self.runners_up())-1][key][
                         f"{i}, {j}, {i_0}"] = prob
                 else:
-                    dictionnary[len(self.runners_up()) - 1][key] = {}
-                    dictionnary[len(self.runners_up()) - 1][key][
+                    dictionnary[len(self.runners_up())-1][key] = {}
+                    dictionnary[len(self.runners_up())-1][key][
                         f"{i}, {j}, {i_0}"] = prob
                 return prob
         else:
             if i == i_0:
                 if j in adm_opp_i0:
                     if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 1
                     else:
-                        dictionnary[len(self.runners_up()) - 1][key] = {}
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key] = {}
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 1
                     return 1
                 else:
                     if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 0
                     else:
-                        dictionnary[len(self.runners_up()) - 1][key] = {}
-                        dictionnary[len(self.runners_up()) - 1][key][
+                        dictionnary[len(self.runners_up())-1][key] = {}
+                        dictionnary[len(self.runners_up())-1][key][
                             f"{i}, {j}, {i_0}"] = 0
                     return 0
             else:
@@ -279,17 +268,11 @@ class GraphBipartite:
             sum += self.proba_cond(i, j, i_0, dictionnary)
         res = sum/len(self.runners_up())
         key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
-        if key in dictionnary[len(self.runners_up()) - 1]:
-            dictionnary[len(self.runners_up()) - 1][key][f"{i}, {j}"] = res
+        if key in dictionnary[len(self.runners_up())-1]:
+            dictionnary[len(self.runners_up())-1][key][f"{i}, {j}"] = res
         else:
-            dictionnary[len(self.runners_up()) - 1][key] = {}
-            dictionnary[len(self.runners_up()) - 1][key][f"{i}, {j}"] = res
-        return res
-
-    def dictionnaire(self):
-        res = {}
-        res[f"{tuple(self.runners_up())}, {tuple(self.winners())}"] = \
-            self.matrix().tolist()
+            dictionnary[len(self.runners_up())-1][key] = {}
+            dictionnary[len(self.runners_up())-1][key][f"{i}, {j}"] = res
         return res
 
     def matrix(self, dictionnary):
@@ -312,7 +295,6 @@ class GraphBipartite:
                         self.runners_up()[j - 1], self.winners()[i - 1],
                                     self.last_runner_drawn)*100, 2))
         matrix = np.array(table, dtype=object)
-        print(dictionnary[len(self.runners_up())-1])
         return matrix
 
 
@@ -357,12 +339,12 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-G_init.remove_2t("Frankfurt", "Napoli")
+G_init.remove_2t("PSG", "Bayern")
 # G_init.remove_2t("Liverpool", "Chelsea")
-G_init.remove_2t("Liverpool", "Benfica")
-G_init.remove_2t("Leipzig", "Manchester City")
-G_init.remove_2t("AC Milan", "Porto")
-G_init.remove_2t("Brugge", "Bayern")
+# G_init.remove_2t("Liverpool", "Benfica")
+# G_init.remove_2t("Leipzig", "Manchester City")
+# G_init.remove_2t("AC Milan", "Porto")
+# G_init.remove_2t("Brugge", "Bayern")
 # G_init.remove_1t("PSG")
 
 dictionnary = []
