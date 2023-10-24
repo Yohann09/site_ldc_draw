@@ -160,6 +160,20 @@ class GraphBipartite:
                                     admissible_opponents[
                                         f"{runner2}"].remove(
                                             winner)
+            for runner_1 in self.runners_up():
+                for runner_2 in self.runners_up():
+                    if (runner_1 != runner_2 and
+                        admissible_opponents[
+                            f"{runner_1}"] == admissible_opponents[
+                                f"{runner_2}"] and
+                        len(admissible_opponents[
+                            f"{runner_2}"]) == 2):
+                        if runner_up != runner_2 and runner_up != runner_2:
+                            for winner in admissible_opponents[f"{runner_1}"]:
+                                if winner in admissible_opponents[
+                                   f"{runner_up}"]:
+                                    admissible_opponents[
+                                        f"{runner_up}"].remove(winner)
             return admissible_opponents[f"{runner_up}"]
         else:
             res = []
@@ -307,10 +321,12 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-G_init.remove_2t("Frankfurt", "Napoli")
+G_init.remove_2t("PSG", "Bayern")
 # G_init.remove_2t("Liverpool", "Chelsea")
-G_init.remove_2t("Liverpool", "Benfica")
-G_init.remove_2t("Leipzig", "Manchester City")
-# G_init.remove_2t("AC Milan", "Porto")
-# G_init.remove_1t("PSG")
+G_init.remove_2t("Frankfurt", "Porto")
+# G_init.remove_2t("Leipzig", "Manchester City")
+# G_init.remove_2t("Inter", "Tottenham")
+# G_init.remove_1t("Inter")
+
 print(G_init.matrix())
+print(G_init.admissible_opponents("Brugge"))

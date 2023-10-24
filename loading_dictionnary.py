@@ -159,6 +159,20 @@ class GraphBipartite:
                                     admissible_opponents[
                                         f"{runner2}"].remove(
                                             winner)
+            for runner_1 in self.runners_up():
+                for runner_2 in self.runners_up():
+                    if (runner_1 != runner_2 and
+                        admissible_opponents[
+                            f"{runner_1}"] == admissible_opponents[
+                                f"{runner_2}"] and
+                        len(admissible_opponents[
+                            f"{runner_2}"]) == 2):
+                        if runner_up != runner_2 and runner_up != runner_2:
+                            for winner in admissible_opponents[f"{runner_1}"]:
+                                if winner in admissible_opponents[
+                                   f"{runner_up}"]:
+                                    admissible_opponents[
+                                        f"{runner_up}"].remove(winner)
             return admissible_opponents[f"{runner_up}"]
         else:
             res = []
@@ -198,82 +212,107 @@ class GraphBipartite:
 
         return runner_up, winner
 
-    def proba_cond(self, i, j, i_0, dictionnary):
-        adm_opp_i0 = self.admissible_opponents(i_0)
+    def is_proba(self, i, j, data):
         key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
-        if self.length() > 2:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    res = round(1/len(adm_opp_i0), 4)
-                    if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = res
-                    else:
-                        dictionnary[len(self.runners_up())-1][key] = {}
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = res
-                    return res
-                else:
-                    if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 0
-                    else:
-                        dictionnary[len(self.runners_up())-1][key] = {}
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 0
-                    return 0
-            else:
-                prob = 0
-                for j_0 in self.graph()[i_0][1:]:
-                    if j_0 != j and j_0 in adm_opp_i0:
-                        G_2 = self.copy_graph()
-                        G_2.remove_2t(i_0, j_0)
-                        prob += G_2.proba(i, j, dictionnary) / len(adm_opp_i0)
-                    else:
-                        prob += 0
-                if key in dictionnary[len(self.runners_up())-1]:
-                    dictionnary[len(self.runners_up())-1][key][
-                        f"{i}, {j}, {i_0}"] = prob
-                else:
-                    dictionnary[len(self.runners_up())-1][key] = {}
-                    dictionnary[len(self.runners_up())-1][key][
-                        f"{i}, {j}, {i_0}"] = prob
-                return prob
+        key2 = f"{i}, {j}"
+        if (key in data[len(self.runners_up())-1] and
+           key2 in data[len(self.runners_up())-1][key]):
+            return True
+        return False
+
+    def is_probacond(self, i, j, i_0, data):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}"
+        if (key in data[len(self.runners_up())-1] and
+           key2 in data[len(self.runners_up())-1][key]):
+            return True
+        return False
+
+    def proba_cond(self, i, j, i_0, dictionnary):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}, {i_0}"
+        if self.is_probacond(i, j, i_0, dictionnary) is True:
+            return dictionnary[len(self.runners_up())-1][key][key2]
         else:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    if key in dictionnary[len(self.runners_up())-1]:
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 1
+            adm_opp_i0 = self.admissible_opponents(i_0)
+            if self.length() > 2:
+                if i == i_0:
+                    if j in adm_opp_i0:
+                        res = round(1/len(adm_opp_i0), 4)
+                        if key in dictionnary[len(self.runners_up())-1]:
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = res
+                        else:
+                            dictionnary[len(self.runners_up())-1][key] = {}
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = res
+                        return res
                     else:
-                        dictionnary[len(self.runners_up())-1][key] = {}
-                        dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 1
-                    return 1
+                        if key in dictionnary[len(self.runners_up())-1]:
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 0
+                        else:
+                            dictionnary[len(self.runners_up())-1][key] = {}
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 0
+                        return 0
                 else:
+                    prob = 0
+                    for j_0 in self.graph()[i_0][1:]:
+                        if j_0 != j and j_0 in adm_opp_i0:
+                            G_2 = self.copy_graph()
+                            G_2.remove_2t(i_0, j_0)
+                            prob += G_2.proba(i, j, dictionnary) / \
+                                len(adm_opp_i0)
+                        else:
+                            prob += 0
                     if key in dictionnary[len(self.runners_up())-1]:
                         dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 0
+                            key2] = prob
                     else:
                         dictionnary[len(self.runners_up())-1][key] = {}
                         dictionnary[len(self.runners_up())-1][key][
-                            f"{i}, {j}, {i_0}"] = 0
-                    return 0
+                            key2] = prob
+                    return prob
             else:
-                print("problem")
+                if i == i_0:
+                    if j in adm_opp_i0:
+                        if key in dictionnary[len(self.runners_up())-1]:
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 1
+                        else:
+                            dictionnary[len(self.runners_up())-1][key] = {}
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 1
+                        return 1
+                    else:
+                        if key in dictionnary[len(self.runners_up())-1]:
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 0
+                        else:
+                            dictionnary[len(self.runners_up())-1][key] = {}
+                            dictionnary[len(self.runners_up())-1][key][
+                                key2] = 0
+                        return 0
+                else:
+                    print("problem")
 
     def proba(self, i, j, dictionnary):
-        sum = 0
-        for i_0 in self.runners_up():
-            sum += self.proba_cond(i, j, i_0, dictionnary)
-        res = sum/len(self.runners_up())
         key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
-        if key in dictionnary[len(self.runners_up())-1]:
-            dictionnary[len(self.runners_up())-1][key][f"{i}, {j}"] = res
+        key2 = f"{i}, {j}"
+        if self.is_proba(i, j, dictionnary) is True:
+            return dictionnary[len(self.runners_up())-1][key][key2]
         else:
-            dictionnary[len(self.runners_up())-1][key] = {}
-            dictionnary[len(self.runners_up())-1][key][f"{i}, {j}"] = res
-        return res
+            sum = 0
+            for i_0 in self.runners_up():
+                sum += self.proba_cond(i, j, i_0, dictionnary)
+            res = sum/len(self.runners_up())
+            if key in dictionnary[len(self.runners_up())-1]:
+                dictionnary[len(self.runners_up())-1][key][key2] = res
+            else:
+                dictionnary[len(self.runners_up())-1][key] = {}
+                dictionnary[len(self.runners_up())-1][key][key2] = res
+            return res
 
     def matrix(self, dictionnary):
         table = []
@@ -339,10 +378,10 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-G_init.remove_2t("PSG", "Bayern")
-# G_init.remove_2t("Liverpool", "Chelsea")
-# G_init.remove_2t("Liverpool", "Benfica")
-# G_init.remove_2t("Leipzig", "Manchester City")
+# G_init.remove_2t("PSG", "Bayern")
+# G_init.remove_2t("Frankfurt", "Porto")
+# G_init.remove_2t("Inter", "Manchester")
+# G_init.remove_2t("Leipzig", "Chelsea")
 # G_init.remove_2t("AC Milan", "Porto")
 # G_init.remove_2t("Brugge", "Bayern")
 # G_init.remove_1t("PSG")

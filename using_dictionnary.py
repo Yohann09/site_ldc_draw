@@ -211,16 +211,18 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-G_init.remove_2t("PSG", "Bayern")
-# G_init.remove_2t("Liverpool", "Chelsea")
-G_init.remove_2t("Liverpool", "Benfica")
-# G_init.remove_2t("Leipzig", "Manchester City")
-G_init.remove_2t("AC Milan", "Porto")
-G_init.remove_1t("Inter")
+# G_init.remove_2t("PSG", "Bayern")
+# G_init.remove_2t("Liverpool", "Benfica")
+# G_init.remove_2t("Frankfurt", "Porto")
+# G_init.remove_2t("Inter", "Manchester City")
+# G_init.remove_2t("Inter", "Tottenham")
+# G_init.remove_1t("Dortmund")
 
 donnees = []
 for i in range(len(G_init.runners_up())):
     with open(f"resultat{i}.json", 'r') as fichier:
         donnees.append(json.load(fichier))
 
-print(G_init.matrix(donnees))
+M = G_init.matrix(donnees)
+print(M)
+print()
