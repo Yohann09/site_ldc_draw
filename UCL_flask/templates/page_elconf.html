@@ -4,7 +4,15 @@
 {% block title %} EL Conf Draw {% endblock %}
 
 {% block content %}
-    <h1>Coucou</h1>
+    <h1 id = "mon-titre">Test des boutons d'équipes</h1>
+    <h2 id = "sous-titre">Affichage en fonction des clics</h2>
+    <div id = "bouton-container">
+        <button id="undo">Undo</button>
+        <!--<button class="team-button">1</button>      Pas utile pour le moment
+        <button class="team-button">2</button>
+        <button class="team-button">3</button>-->
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 
 
