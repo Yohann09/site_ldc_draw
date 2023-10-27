@@ -4,6 +4,7 @@
     display: inline-block ;
     text-align: center;
     border: none;
+    padding: 15px;
 }
 .winner{
     background-color: darkkhaki;
@@ -11,7 +12,7 @@
     display: inline-block;
     text-align: center;
     border: none;
-    margin-outside: 10px;
+    padding: 15px;
 }
 
 table,tr{
@@ -24,4 +25,9 @@ td, th {
     text-align: center; /* Centrer horizontalement */
     vertical-align: middle; /* Centrer verticalement */
 
+}
+
+#bouton-container {
+  display: flex;
+  justify-content: space-between; /* Répartit l'espace disponible entre les boutons */
 }

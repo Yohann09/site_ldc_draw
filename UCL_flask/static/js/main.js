@@ -46,8 +46,29 @@ for(let i=0; i<taille_boucle;i++){
 function disappear_bouton(bouton){
     bouton.style.display = "none";
 }
-// Fonction qui ajoute les équipes à la section affichant les matchs
-let listTeam = document.getElementById("team-list")
+// Je vais essayer de créer ledit tableau
+let tableMatch = document.getElementById("match-table")
+let tableTitle = document.createElement("caption")
+tableTitle.textContent = "Matchs"
+tableMatch.appendChild(tableTitle)
+for(let i=0;i<Winners.length;i++){
+    let new_line = document.createElement("tr")
+    for(let j=0;j<3;j++){
+        if(j===1){
+            let new_cell = document.createElement("td")
+            new_cell.textContent = " VS "
+            new_line.appendChild(new_cell)
+        }else{
+            let new_cell = document.createElement("td")
+            new_cell.textContent = "  ?  "
+            // id pour récupérer ensuite la cellule et en modifier le contenu
+            new_cell.id = String(i) +"_"+ String(j)
+            new_line.appendChild(new_cell)
+        }
+    }
+    tableMatch.appendChild(new_line)
+}
+// Je vais essayer de créer une nouvelle fonction remplissant un tableau
 function add_team_to_list_match(bouton){
     //  Change les boutons
     let list=[]
@@ -70,19 +91,17 @@ function add_team_to_list_match(bouton){
     })
     chosen_team.push(bouton)    // Rajoute l'équipe dans les équipes choisies
     // Ajoute la liste des matchs en fonction des clics de l'utilisateur
-    let nouvelleSection = document.createElement("div")
-    nouvelleSection.id = "container " + String(chosen_team.length)
-    nouvelleSection.textContent += bouton.textContent
-    listTeam.appendChild(nouvelleSection)
+    let number = chosen_team.length
+    let i = 1+(-1)**(number%2)
+    let j = Math.floor((number-1)/2)
+    let cell = document.getElementById(String(j)+"_"+String(i))
+    cell.textContent=bouton.textContent
 }
-
-// Fait disparaître les boutons quand on clique dessus
+// Fait disparaître les boutons quand on clique dessus et les ajoute à liste des matchs
 for(let i=0; i<boutons_winners.length; i++) {
     boutons_winners[i].addEventListener("click", function (event) {
         if(affichage_winners) {
             let bouton = event.target
-            console.log(bouton.textContent)
-            console.log(boutons_winners[i])
             disappear_bouton(bouton)
             add_team_to_list_match(bouton)
             affichage_winners = false
@@ -93,7 +112,6 @@ for(let i=0; i<boutons_runner.length; i++) {
     boutons_runner[i].addEventListener("click", function (event) {
         if(!affichage_winners) {
             let bouton = event.target
-            console.log(bouton.textContent)
             disappear_bouton(bouton)
             add_team_to_list_match(bouton)
             affichage_winners = true
@@ -154,8 +172,13 @@ undo_button.addEventListener("click", function(event){
                 disappear_bouton(bouton)
             }
         })
-        let sectionDeleted = document.getElementById("container "+String(chosen_team.length+1))
-        sectionDeleted.remove()
+        let number = chosen_team.length + 1     // On enlève les équipes du tableau
+        let i = 1+(-1)**(number%2)
+        let j = Math.floor((number-1)/2)
+        let cell = document.getElementById(String(j)+"_"+String(i))
+        cell.textContent="?"
+        //let sectionDeleted = document.getElementById("container "+String(chosen_team.length+1))
+        //sectionDeleted.remove()
     }
 })
 
@@ -178,12 +201,10 @@ for(let i=0; i<Runners_up.length; i++){
             let team = document.createElement("td")
             team.textContent = Runners_up[i]
             line.appendChild(team)
-            console.log("dans le if")
         }else{
             let cell = document.createElement("td")
             cell.textContent = String(i)+String(j)
             line.appendChild(cell)
-            console.log("dans le else")
         }
     }
     table.appendChild(line)
