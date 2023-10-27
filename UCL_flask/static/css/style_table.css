@@ -1,0 +1,35 @@
+.runner_up{
+    background-color: aquamarine;
+    border-radius: 5px;
+    display: inline-block ;
+    text-align: center;
+    border: none;
+    padding: 15px;
+    /*margin: 20px*/
+}
+.winner{
+    background-color: darkkhaki;
+    border-radius: 5px;
+    display: inline-block;
+    text-align: center;
+    border: none;
+    padding: 15px;
+    /*margin: 20px*/
+}
+
+table,tr{
+    border : 2px solid rgba(0, 0, 0, 0.67);
+        border-collapse: collapse;
+
+}
+
+td, th {
+    text-align: center; /* Centrer horizontalement */
+    vertical-align: middle; /* Centrer verticalement */
+
+}
+
+#bouton-container {
+  display: flex;
+  justify-content: space-between;
+}

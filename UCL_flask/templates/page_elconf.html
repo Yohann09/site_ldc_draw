@@ -4,7 +4,26 @@
 {% block title %} EL Conf Draw {% endblock %}
 
 {% block content %}
-    <h1>Coucou</h1>
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style_table.css') }}">
+    <h1 id = "mon-titre">Test des boutons d'équipes</h1>
+    <h2 id = "sous-titre">Affichage en fonction des clics</h2>
+    <div id = "bouton-container">
+        <button id="undo">Undo</button>
+        <!--<button class="team-button">1</button>      Pas utile pour le moment
+        <button class="team-button">2</button>
+        <button class="team-button">3</button>-->
+    </div>
+    <div id="match-container">
+        <p id="match-table"></p>
+    </div>
+    <!-- tentative de création d'un tableau pour tout afficher-->
+    <!-- _____________ -->
+    <aside>
+        <table id="proba-table">
+        </table>
+    </aside>
+    <!-- ____________ -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 
 
