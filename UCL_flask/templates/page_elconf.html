@@ -6,23 +6,19 @@
 {% block content %}
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style_table.css') }}">
     <h1 id = "mon-titre">Test des boutons d'équipes</h1>
-    <h2 id = "sous-titre">Affichage en fonction des clics</h2>
-    <div id = "bouton-container">
-        <button id="undo">Undo</button>
-        <!--<button class="team-button">1</button>      Pas utile pour le moment
-        <button class="team-button">2</button>
-        <button class="team-button">3</button>-->
-    </div>
-    <div id="match-container">
-        <p id="match-table"></p>
+    <div id="table-container">  <!-- section qui contient les deux tableaux-->
+        <table id="match-table"></table>
+        <table id="proba-table"></table>  <!-- On crée le tableau avec les probas dans main.js-->
     </div>
     <!-- tentative de création d'un tableau pour tout afficher-->
     <!-- _____________ -->
-    <aside>
-        <table id="proba-table">
-        </table>
-    </aside>
+    <div id = "bouton-container">
+        <button id="undo">Undo</button>
+    </div>
     <!-- ____________ -->
+    <footer id="footer">
+       <p>Developped by Akram, Bilel, Flavien and Yohann</p>
+   </footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 

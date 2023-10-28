@@ -1,35 +1,97 @@
+/* Toute la page */
+#container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+}
+
+/* Affichage des boutons */
+
+#bouton-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+
 .runner_up{
     background-color: aquamarine;
     border-radius: 5px;
-    display: inline-block ;
+    /*display: inline-block ;*/
     text-align: center;
     border: none;
     padding: 15px;
-    /*margin: 20px*/
+    margin: 15px
+}
+.runner_up:hover{
+    background-color: rgba(127, 255, 212, 0.82);
 }
 .winner{
     background-color: darkkhaki;
     border-radius: 5px;
-    display: inline-block;
+    /*display: inline-block;*/
     text-align: center;
     border: none;
     padding: 15px;
-    /*margin: 20px*/
+    margin: 15px
+}
+.winner:hover{
+    background-color: rgba(189, 183, 107, 0.82);
 }
 
-table,tr{
-    border : 2px solid rgba(0, 0, 0, 0.67);
+#undo{
+    background-color: #ffff3e;
+}
+
+/* Affichage des tableaux */
+
+#table-container{ /* Contenant des deux tableaux*/
+    display : flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 120%;
+    color: rgba(0, 0, 0, 0.66)
+}
+
+/* Affichage du tableau des probas */
+
+#proba-table{
+    border : 1px solid #8c8888;
         border-collapse: collapse;
-
-}
-
-td, th {
     text-align: center; /* Centrer horizontalement */
     vertical-align: middle; /* Centrer verticalement */
+    border-radius: 8px;
+}
+
+#team-line{
 
 }
 
-#bouton-container {
-  display: flex;
-  justify-content: space-between;
+.cell-team{
+    font-weight: bolder;
+}
+
+/* Affichage di tableau des matchs */
+
+#match-table{
+    border: 1px solid #8c8888;
+    order: 1;  /* Pour afficher le tableau de proba à gauche*/
+    border-radius: 5px;
+
+}
+
+.cell-match-table{
+    text-align: center;
+}
+
+/* Affichage du pied de page */
+
+#footer{
+    background-color: lightgrey;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #484848;
 }

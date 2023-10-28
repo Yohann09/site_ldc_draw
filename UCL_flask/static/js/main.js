@@ -1,11 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
-    let monSousTitre = document.getElementById("sous-titre");
-
     // Modifiez le contenu du titre
-    monTitre.textContent = "Le test Javascirpt fonctionne";
-    monSousTitre.textContent = "Test affichage boutons selon clic";
+    monTitre.textContent = "Tirage UCL";
 });
 
 // Sélectionnez le conteneur des boutons
@@ -16,6 +13,8 @@ let Winners = ["Napoli", "FC Porto", "FC Bayern", "Tottenham", "Chelsea FC", "Re
 let Runners_up = ["Liverpool", "FC	Brugge", "Inter", "Frankfurt", "AC Milan", "Leipzig", "Dortmund", "Paris SG"]
 
 let affichage_winners = true  // pour savoir quel type de boutons est affiché
+
+const default_cell_match = "........."
 
 // Crée et ajoute les boutons au conteneur
 let boutons_winners = []    // Ce sont les boutons qui sont toujours affichés sur le site
@@ -46,7 +45,9 @@ for(let i=0; i<taille_boucle;i++){
 function disappear_bouton(bouton){
     bouton.style.display = "none";
 }
-// Je vais essayer de créer ledit tableau
+
+
+// Tableau où vont être affiché les matchs
 let tableMatch = document.getElementById("match-table")
 let tableTitle = document.createElement("caption")
 tableTitle.textContent = "Matchs"
@@ -60,15 +61,18 @@ for(let i=0;i<Winners.length;i++){
             new_line.appendChild(new_cell)
         }else{
             let new_cell = document.createElement("td")
-            new_cell.textContent = "  ?  "
+            new_cell.textContent = default_cell_match
             // id pour récupérer ensuite la cellule et en modifier le contenu
             new_cell.id = String(i) +"_"+ String(j)
+            new_cell.className = "cell-match-table"
             new_line.appendChild(new_cell)
         }
     }
+    new_line.className = "line-match-table"
     tableMatch.appendChild(new_line)
 }
-// Je vais essayer de créer une nouvelle fonction remplissant un tableau
+
+// Fonction qui ajoute les équipes au tableau et change les boutons affichés
 function add_team_to_list_match(bouton){
     //  Change les boutons
     let list=[]
@@ -107,7 +111,7 @@ for(let i=0; i<boutons_winners.length; i++) {
             affichage_winners = false
         }
     });
-}
+} // Même fonction pour cette boucle
 for(let i=0; i<boutons_runner.length; i++) {
     boutons_runner[i].addEventListener("click", function (event) {
         if(!affichage_winners) {
@@ -119,33 +123,6 @@ for(let i=0; i<boutons_runner.length; i++) {
     })
 }
 
-// Semble ne pas marcher
-/*
-if(affichage_winners){
-    console.log("on entre dans le if")
-    for(let i=0; i<boutons_winners.length; i++) {
-        boutons_winners[i].addEventListener("click", function (event) {
-            let bouton = boutons_winners[i]
-            disappear_bouton(bouton)
-            add_team_to_list_match(bouton)
-            affichage_winners=false
-            console.log(i<boutons_runner.length)
-        });
-    }
-}else{
-    console.log("On entre dans le else")
-    for(let i=0; i<boutons_runner.length; i++) {
-        console.log("dans la première boucle")
-        boutons_runner[i].addEventListener("click", function (event) {
-            let bouton = boutons_runner[i]
-            console.log("dans la boucle")
-            disappear_bouton(bouton)
-            add_team_to_list_match(bouton)
-            affichage_winners = true
-        })
-    }
-}
-*/
 // Touche pour revenir en arrière, enlever la dernière équipe ajoutée
 let undo_button = document.getElementById("undo")
 undo_button.addEventListener("click", function(event){
@@ -176,13 +153,14 @@ undo_button.addEventListener("click", function(event){
         let i = 1+(-1)**(number%2)
         let j = Math.floor((number-1)/2)
         let cell = document.getElementById(String(j)+"_"+String(i))
-        cell.textContent="?"
+        cell.textContent= default_cell_match
         //let sectionDeleted = document.getElementById("container "+String(chosen_team.length+1))
         //sectionDeleted.remove()
     }
 })
 
-// Remplie la première ligne du tableau
+// Rempli le tableau des probas
+// Rempli la première ligne avec les équipes
 let table = document.getElementById("proba-table")
 let team_line = document.createElement("tr")
 let vide = document.createElement("th")
@@ -190,23 +168,28 @@ team_line.appendChild(vide)
 Winners.forEach(function(name){
     let team = document.createElement("th")
     team.textContent = name
+    team.className = "team-cell"
     team_line.appendChild(team)
 })
+team_line.className = "team-line"
 table.appendChild(team_line)
-
+// Rempli le reste du tableau par des nombres arbitraire pour l'instant
 for(let i=0; i<Runners_up.length; i++){
     let line = document.createElement("tr")
     for(let j=0;j<Winners.length+1;j++){
         if(j===0) {
             let team = document.createElement("td")
             team.textContent = Runners_up[i]
+            team.className = "cell-team"
             line.appendChild(team)
         }else{
             let cell = document.createElement("td")
             cell.textContent = String(i)+String(j)
+            cell.className = "proba-cell"
             line.appendChild(cell)
         }
     }
+    line.className = "proba-line"
     table.appendChild(line)
 }
 
