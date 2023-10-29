@@ -364,6 +364,8 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
+
+
 G_init.remove_2t("PSG", "Bayern")
 G_init.remove_2t("AC Milan", "Benfica")
 G_init.remove_2t("Frankfurt", "Porto")
