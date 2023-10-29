@@ -150,21 +150,15 @@ class GraphBipartite:
             for j in range(0, len(runners)):
                 if self.length() % 2 == 0:
                     key2 = f"{runners[i]}, {winners[j]}"
-                    if key1 in data[len(runners)-1] and key2 \
-                       in data[len(runners)-1][key1]:
-                        table[j+1].append(round(
-                            data[len(self.runners_up()) - 1][
-                                key1][key2]*100, 2))
+                    if key1 in data and key2 in data[key1]:
+                        table[j+1].append(round(data[key1][key2]*100, 2))
                     else:
                         print(f"not, {key1}, {key2}")
                 else:
                     key2 = \
                         f"{runners[i]}, {winners[j]}, {self.last_runner_drawn}"
-                    if key1 in data[len(runners)-1] and key2 \
-                       in data[len(runners)-1][key1]:
-                        table[j+1].append(round(
-                            data[len(self.runners_up()) - 1][
-                                key1][key2]*100, 2))
+                    if key1 in data and key2 in data[key1]:
+                        table[j+1].append(round(data[key1][key2]*100, 2))
         matrix = np.array(table, dtype=object)
         return matrix
 
@@ -211,18 +205,17 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-# G_init.remove_2t("PSG", "Bayern")
-# G_init.remove_2t("Liverpool", "Benfica")
+G_init.remove_2t("PSG", "Bayern")
+G_init.remove_2t("AC Milan", "Benfica")
 # G_init.remove_2t("Frankfurt", "Porto")
 # G_init.remove_2t("Inter", "Manchester City")
-# G_init.remove_2t("Inter", "Tottenham")
+# G_init.remove_2t("Leipzig", "Napoli")
 # G_init.remove_1t("Dortmund")
 
-donnees = []
-for i in range(len(G_init.runners_up())):
-    with open(f"resultat{i}.json", 'r') as fichier:
-        donnees.append(json.load(fichier))
+with open("resultat.json", 'r') as fichier:
+    donnees = json.load(fichier)
 
 M = G_init.matrix(donnees)
 print(M)
-print()
+
+print(len(donnees))
