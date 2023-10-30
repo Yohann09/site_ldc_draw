@@ -1,6 +1,9 @@
 import random
 import numpy as np
 import copy
+import json
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
 
 
 class team:
@@ -110,10 +113,8 @@ class GraphBipartite:
             del self._graph[j_0]
         else:
             print("not in dictionnary")
-
         self._runners_up.remove(i_0)
         self._winners.remove(j_0)
-
         for team in self.graph():
             if i_0 in self.graph()[team]:
                 self._graph[team].remove(i_0)
@@ -126,64 +127,47 @@ class GraphBipartite:
         self.set_length(self.length() - 1)
         self.last_runner_drawn = runner
 
+    def convert(self):
+        matrix = []
+        i = 0
+        for winner in self.winners():
+            matrix.append([])
+            for runner_up in self.runners_up():
+                if runner_up in self.graph()[winner][1:]:
+                    matrix[i].append(1)
+                else:
+                    matrix[i].append(0)
+            i += 1
+        return matrix
+
     def admissible_opponents(self, runner_up):
         if self.length() > 2:
-            admissible_opponents = {}
-            for runner in self.runners_up():
-                admissible_opponents[f"{runner}"] = self.graph()[
-                    f"{runner}"][1:]
-                if admissible_opponents[f"{runner}"] == []:
-                    return "no opponents"
-
-                for runner in admissible_opponents:
-                    if len(admissible_opponents[f"{runner}"]) == 1:
-                        for runner2 in admissible_opponents:
-                            if runner2 == runner:
-                                continue
-                            else:
-                                if admissible_opponents[f"{runner}"][0] in \
-                                     admissible_opponents[f"{runner2}"]:
-                                    admissible_opponents[
-                                        f"{runner2}"].remove(
-                                            admissible_opponents[
-                                                f"{runner}"][0])
-                for winner in self.winners():
-                    if len(self.graph()[f"{winner}"]) == 2:
-                        admissible_opponents[self.graph()[f"{winner}"][1]] = [
-                            f"{winner}"]
-                        for runner2 in admissible_opponents:
-                            if runner2 == self.graph()[f"{winner}"][1]:
-                                continue
-                            else:
-                                if winner in admissible_opponents[
-                                     f"{runner2}"]:
-                                    admissible_opponents[
-                                        f"{runner2}"].remove(
-                                            winner)
-            for runner_1 in self.runners_up():
-                for runner_2 in self.runners_up():
-                    if (runner_1 != runner_2 and
-                        admissible_opponents[
-                            f"{runner_1}"] == admissible_opponents[
-                                f"{runner_2}"] and
-                        len(admissible_opponents[
-                            f"{runner_2}"]) == 2):
-                        if runner_up != runner_2 and runner_up != runner_2:
-                            for winner in admissible_opponents[f"{runner_1}"]:
-                                if winner in admissible_opponents[
-                                   f"{runner_up}"]:
-                                    admissible_opponents[
-                                        f"{runner_up}"].remove(winner)
-            return admissible_opponents[f"{runner_up}"]
+            admissible_opponents = self.graph()[runner_up][1:]
+            if len(admissible_opponents) == 1:
+                return admissible_opponents
+            for winner in self.winners():
+                if self.graph()[winner][1:] == [runner_up]:
+                    return [winner]
+            for winner in self.graph()[runner_up][1:]:
+                matrix = self.convert()
+                i = 0
+                while self.winners()[i] != winner:
+                    i += 1
+                matrix.pop(i)
+                j = 0
+                while self.runners_up()[j] != runner_up:
+                    j += 1
+                for line in matrix:
+                    line.pop(j)
+                graph = csr_matrix(matrix)
+                if -1 in maximum_bipartite_matching(
+                   graph, perm_type='column'):
+                    admissible_opponents.remove(winner)
+            return admissible_opponents
         else:
-            res = []
-            if len(self.graph()[f"{runner_up}"]) == 2:
-                res.append(self.graph()[f"{runner_up}"][1])
-            else:
-                return "prooblem"
-            return res
+            return self.winners()
 
-    def subgraphs(self):
+    def subgraphs(self):    # sert à r
         G = {}
         i = self.length()
         G[f"{i}"] = [self.copy_graph()]
@@ -203,15 +187,6 @@ class GraphBipartite:
                             G[f"{i}"].append(G_3)
         return G
 
-    def all_admissible_opponents(self):        # sert à rien pour l'instant
-        all_admissible_opponents = {}
-        for subgraph in self.subgraphs():
-            all_admissible_opponents[subgraph] = []
-            for runner in self.subgraphs()[subgraph].runners_up:
-                all_admissible_opponents[subgraph].append(self.subgraphs()[
-                    subgraph].admissible_opponents(runner))
-        return all_admissible_opponents
-
     def random_pick(self):
         index_runner_up = random.randint(0, len(self.runners_up) - 1)
         runner_up = self.runners_up()[index_runner_up]
@@ -222,42 +197,109 @@ class GraphBipartite:
 
         return runner_up, winner
 
-    def proba_cond(self, i, j, i_0):
-        adm_opp_i0 = self.admissible_opponents(i_0)
-        if self.length() > 2:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    return round(1/len(adm_opp_i0), 4)
+    def is_proba(self, i, j, data):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}"
+        if (key in data and
+           key2 in data[key]):
+            return True
+        return False
+
+    def is_probacond(self, i, j, i_0, data):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}, {i_0}"
+        if (key in data and
+           key2 in data[key]):
+            return True
+        return False
+
+    def proba_cond(self, i, j, i_0, dictionnary):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}, {i_0}"
+        if self.is_probacond(i, j, i_0, dictionnary) is True:
+            return dictionnary[key][key2]
+        else:
+            adm_opp_i0 = self.admissible_opponents(i_0)
+            if self.length() > 2:
+                if i == i_0:
+                    if j in adm_opp_i0:
+                        res = 1/len(adm_opp_i0)
+                        if key in dictionnary:
+                            dictionnary[key][
+                                key2] = res
+                        else:
+                            dictionnary[key] = {}
+                            dictionnary[key][
+                                key2] = res
+                        return res
+                    else:
+                        if key in dictionnary:
+                            dictionnary[key][
+                                key2] = 0
+                        else:
+                            dictionnary[key] = {}
+                            dictionnary[key][
+                                key2] = 0
+                        return 0
                 else:
-                    return 0
-            else:
-                prob = 0
-                for j_0 in self.graph()[i_0][1:]:
-                    if j_0 != j:
-                        if j_0 in adm_opp_i0:
+                    prob = 0
+                    for j_0 in self.graph()[i_0][1:]:
+                        if j_0 != j and j_0 in adm_opp_i0:
                             G_2 = self.copy_graph()
                             G_2.remove_2t(i_0, j_0)
-                            prob += G_2.proba(i, j) / \
+                            prob += G_2.proba(i, j, dictionnary) / \
                                 len(adm_opp_i0)
                         else:
                             prob += 0
-            return prob
-        else:
-            if i == i_0:
-                if j in adm_opp_i0:
-                    return 1
-                else:
-                    return 0
+                    if key in dictionnary:
+                        dictionnary[key][
+                            key2] = prob
+                    else:
+                        dictionnary[key] = {}
+                        dictionnary[key][
+                            key2] = prob
+                    return prob
             else:
-                print("problem")
+                if i == i_0:
+                    if j in adm_opp_i0:
+                        if key in dictionnary:
+                            dictionnary[key][
+                                key2] = 1
+                        else:
+                            dictionnary[key] = {}
+                            dictionnary[key][
+                                key2] = 1
+                        return 1
+                    else:
+                        if key in dictionnary:
+                            dictionnary[key][
+                                key2] = 0
+                        else:
+                            dictionnary[key] = {}
+                            dictionnary[key][
+                                key2] = 0
+                        return 0
+                else:
+                    print("problem")
 
-    def proba(self, i, j):
-        sum = 0
-        for i_0 in self.runners_up():
-            sum += self.proba_cond(i, j, i_0)
-        return sum/len(self.runners_up())
+    def proba(self, i, j, dictionnary):
+        key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
+        key2 = f"{i}, {j}"
+        if self.is_proba(i, j, dictionnary) is True:
+            return dictionnary[key][key2]
+        else:
+            sum = 0
+            for i_0 in self.runners_up():
+                sum += self.proba_cond(i, j, i_0, dictionnary)
+            res = sum/len(self.runners_up())
+            if key in dictionnary:
+                dictionnary[key][key2] = res
+            else:
+                dictionnary[key] = {}
+                dictionnary[key][key2] = res
+            return res
 
-    def matrix(self):
+    def matrix(self, dictionnary):
         table = []
         for i in range(len(self.winners()) + 1):
             table.append([])
@@ -269,13 +311,14 @@ class GraphBipartite:
         for i in range(1, len(self.winners()) + 1):
             for j in range(1, len(self.runners_up()) + 1):
                 if self.length() % 2 == 0:
-                    table[i].append(round(
-                        self.proba(self.runners_up()[j - 1],
-                                   self.winners()[i - 1])*100, 2))
+                    prob = self.proba(self.runners_up()[j - 1],
+                                      self.winners()[i - 1], dictionnary)
+                    table[i].append(round(prob*100, 2))
                 else:
                     table[i].append(round(self.proba_cond(
                         self.runners_up()[j - 1], self.winners()[i - 1],
-                                    self.last_runner_drawn)*100, 2))
+                                    self.last_runner_drawn,
+                                    dictionnary)*100, 2))
         matrix = np.array(table, dtype=object)
         return matrix
 
@@ -324,11 +367,14 @@ for team1 in winners:
 
 
 G_init.remove_2t("PSG", "Bayern")
-# G_init.remove_2t("Liverpool", "Chelsea")
+G_init.remove_2t("AC Milan", "Benfica")
 G_init.remove_2t("Frankfurt", "Porto")
-# G_init.remove_2t("Leipzig", "Manchester City")
-# G_init.remove_2t("Inter", "Tottenham")
-# G_init.remove_1t("Inter")
+# G_init.remove_2t("Inter", "Manchester City")
+# G_init.remove_2t("Leipzig", "Napoli")
+# G_init.remove_1t("Dortmund")
 
-print(G_init.matrix())
-print(G_init.admissible_opponents("Brugge"))
+dictionnary = {}
+print(G_init.matrix(dictionnary))
+
+with open("resultat.json", 'w') as fichier:
+    json.dump(dictionnary, fichier)
