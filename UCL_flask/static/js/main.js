@@ -1,14 +1,100 @@
 // Test du chargement des probas:
 
-const resultat = fetch("/static/resultat7.json")
-  .then(response => response.json())
-  .then(data => {
-    console.log(data); // Les données JSON sont disponibles ici
+let xhr = new XMLHttpRequest();
+xhr.overrideMimeType("application/json");
+xhr.open("GET", "/static/resultat.json", false); // Notez-le "false" pour le mode synchrone
+xhr.send();
+
+let resultat;
+
+if (xhr.status === 200) {
+  resultat = JSON.parse(xhr.responseText);
+  // Je peux maintenant utiliser myJSONData dans le reste du code
+  console.log(resultat);
+} else {
+  console.error('Erreur de chargement du fichier JSON');
+}
+
+//console.log(resultat["('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')"]["Brugge, Napoli, Dortmund"])
+
+/*
+let jsonData = null;
+
+async function fetchData() {
+  try {
+    const response = await fetch("/static/resultat.json");
+    jsonData = await response.json();
+  } catch (error) {
+    console.error('Erreur de chargement du fichier JSON :', error);
+  }
+}
+
+async function main() {
+  if (jsonData === null) {
+    await fetchData();
+  }
+  return jsonData;
+}
+
+async function accederAuJson(indice,indice2) {
+  const resultat = await main();
+  const valeur = resultat[indice][indice2];
+  return valeur;
+}*/
+
+// Nouveau test
+/*
+function loadJSONFile(url, callback) {
+  let xhr = new XMLHttpRequest();
+  xhr.overrideMimeType("application/json");
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      callback(JSON.parse(xhr.responseText));
+    }
+  };
+  xhr.send();
+}
+
+let myJSONData; // Variable pour stocker le JSON
+
+loadJSONFile("/static/resultat.json", function (data) {
+  myJSONData = data;
+  // Vous pouvez effectuer des opérations avec myJSONData ici
+    console.log(myJSONData)
+});
+console.log(myJSONData)*/
+// Test d'utilisation de la fonction accéder au JSON
+/*
+accederAuJson("('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')", "Brugge, Napoli, Dortmund")
+  .then(valeur => {
+    console.log(valeur);
   })
   .catch(error => {
-    console.error('Erreur de chargement du fichier JSON :', error);
+    console.error('Erreur :', error);
   });
 
+
+async function afficherValeurDansCellule(celluleId,indice,indice2) {
+  const valeur = await accederAuJson(indice,indice2);
+
+  // Obtenez la référence de la cellule par son ID
+  const cellule = document.getElementById(celluleId);
+
+  // Assurez-vous que la cellule existe
+  if (cellule) {
+    // Affectez la valeur à la cellule
+      let nombre = valeur*100;
+      let nombre_arrondi = nombre.toFixed(2)
+      cellule.textContent = String(nombre_arrondi)+" %";
+  } else {
+      console.error("La cellule n'existe pas.");
+  }
+}
+*/
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
@@ -19,11 +105,13 @@ document.addEventListener("DOMContentLoaded", function() {
 // Sélectionnez le conteneur des boutons
 let boutonContainer = document.getElementById("bouton-container");
 
-// Créez un tableau de noms de boutons
-let Winners = ["Napoli", "FC_Porto", "FC_Bayern", "Tottenham", "Chelsea_FC", "Real_Madrid", "Man_City", "Benfica"];
-let Runners_up = ["Liverpool", "FC_Brugge", "Inter", "Frankfurt", "AC_Milan", "Leipzig", "Dortmund", "Paris_SG"]
-
-let affichage_winners = true  // pour savoir quel type de boutons est affiché
+// Nom des équipes en un morceau plus pratique à manipuler
+let Winners = ["Napoli", "Porto", "Bayern", "Tottenham", "Chelsea", "Real_Madrid", "Manchester_City", "Benfica"];
+let Runners_up = ["Liverpool", "Brugge", "Inter", "Frankfurt", "AC_Milan", "Leipzig", "Dortmund", "PSG"]
+// Liste des équipes comme elles sont écrites dans le fichier resultat.json
+let runners_resultat = ['Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG']
+let winners_resultat = ['Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica']
+let affichage_winners = false  // pour savoir quel type de boutons est affiché
 
 const default_cell_match = "........."
 
@@ -41,6 +129,7 @@ for(let i=0; i<taille_boucle;i++){
         bouton.className = "winner";
         boutonContainer.appendChild(bouton);
         boutons_winners.push(bouton);
+        bouton.style.display="none";
     }
     if(i<Runners_up.length){
         let bouton = document.createElement("button");
@@ -48,7 +137,7 @@ for(let i=0; i<taille_boucle;i++){
         bouton.className = "runner_up";
         boutonContainer.appendChild(bouton);
         boutons_runner.push(bouton);
-        bouton.style.display="none";
+
     }
 }
 
@@ -57,6 +146,112 @@ function disappear_bouton(bouton){
     bouton.style.display = "none";
 }
 
+// Fonction qui change uppercase par espace
+function change_bySpace(word){
+    const new_word = word.replace(/_/g, ' ');
+    return new_word;
+}
+
+// Fonction qui change la valeur de la cellule
+function change_proba(cell,index,index2){
+    if(cell){
+        let nombre = resultat[index][index2]
+        console.log(nombre)
+        nombre = 100*nombre
+        cell.textContent = String(nombre.toFixed(2))+"%"
+    }else{
+        console.log("erreur dans change proba")
+    }
+}
+
+function change_graphism(){
+    // Illumine la colonne en jaune
+    if(chosen_team.length%2===1){
+        for(let j=chosen_team.length-2;j<chosen_team.length;j++){
+            let bouton = chosen_team[j]
+            let selecteur = "."+bouton.textContent
+            let colorChange = document.querySelectorAll(selecteur)
+            colorChange.forEach(function (element){
+                element.style.backgroundColor = "rgba(253,253,104,0.82)"
+            })
+        }
+    }else{
+        for(let j=chosen_team.length-2;j<chosen_team.length;j++){
+            let bouton = chosen_team[j]
+            let selecteur = "."+bouton.textContent
+            let colorChange = document.querySelectorAll(selecteur)
+            let i=0
+            colorChange.forEach(function (element){
+                if(i>0){
+                    element.style.backgroundColor = "transparent"
+                    element.textContent = "0.00%"
+                }else{
+                    element.style.backgroundColor = "transparent"
+                }
+                i++
+            })
+        }
+    }
+}
+
+function remove(list,elt_to_delete){
+    list.splice(list.indexOf(elt_to_delete), 1)
+}
+function remove_from_list(){ // Utilise les variables globales
+    let runner = []
+    let winner = []
+    let max_index;
+    runners_resultat.forEach(function(name){
+        runner.push(name)
+    })
+    winners_resultat.forEach(function(name){
+        winner.push(name)
+    })
+    console.log("chosen team length: " + chosen_team.length)
+    if(chosen_team.length%2 === 1){max_index = chosen_team.length-1}
+    else{max_index = chosen_team.length}
+    for(let i=0;i<max_index;i++) {
+        //console.log("valeur de i" + String(i))
+        let name = chosen_team[i].textContent
+        if (runner.includes(name)) {
+            remove(runner, name)
+        } else if (winner.includes(name)) {
+            remove(winner, name)
+        }
+    }
+    let index = "('" + runner[0] + "'"
+    for(let i=1;i<runner.length-1;i++){
+        index += ", '"+ runner[i]+"'"
+    }
+    index+= ", '"+runner[runner.length-1] +"'), ("
+    index += "'"+winner[0]+"'"
+    for(let i=1;i<winner.length-1;i++){
+        index += ", '"+ winner[i]+"'"
+    }
+    index+= ", '"+winner[winner.length-1] +"')"
+    return index
+}
+
+function give_index2(winner,runner){ // Utilise des variables globales
+    let index2 = change_bySpace(runner)+", "+change_bySpace(winner);
+    if(affichage_winners){
+        index2+=", "+change_bySpace(chosen_team[chosen_team.length-1].textContent)
+    }
+    return index2
+}
+function change_all(){
+    for(let i=0;i<Winners.length;i++){
+        for(let j=0;j<Runners_up.length;j++){
+            let id = Runners_up[i]+" "+Winners[j]
+            let cell = document.getElementById(id)
+            let index = remove_from_list()
+            console.log(index)
+            let index2 = give_index2(Winners[j],Runners_up[i])
+            console.log(index2)
+            change_proba(cell,index,index2)
+        }
+    }
+}
 
 // Tableau où vont être affiché les matchs
 let tableMatch = document.getElementById("match-table")
@@ -88,7 +283,7 @@ function add_team_to_list_match(bouton){
     //  Change les boutons
     let list=[]
     let other_list=[]
-    if(boutons_winners.includes(bouton)){
+    if(boutons_winners.includes(bouton)){  // if affichage_winners
         list = boutons_winners
         other_list = boutons_runner     // Peut aussi se faire avec affichage_winners dans la condition
     }else{
@@ -102,15 +297,22 @@ function add_team_to_list_match(bouton){
         disappear_bouton(button)
     })
     other_list.forEach(function(button){
-        button.style.display="block"
+        // Si la proba du texte de ce button avec le dernier choisi: bouton est de 0 alors on n'affiche pas le button
+        // car le match ne peut pas avoir lieu et donc pas de calcul de proba
+        console.log(bouton.textContent)
+        if(affichage_winners) {  // on vérifie que le bouton est un runner, dans ce cas on peut pas afficher tous les winners
+            let cellule = document.getElementById(bouton.textContent+" "+button.textContent)
+            let proba = parseFloat(cellule.textContent)
+            if(proba !== 0){
+                button.style.display="block"
+            }
+        }
+        else{button.style.display="block"}
     })
     chosen_team.push(bouton)    // Rajoute l'équipe dans les équipes choisies
-    // Illumine la colonne en jaune
-    let selecteur = "."+bouton.textContent
-    let colorChange = document.querySelectorAll(selecteur)
-    colorChange.forEach(function (element){
-        element.style.backgroundColor = "#fdfd68"
-    })
+    // J'actualise toutes les probas
+    change_all()
+    change_graphism()
     // Ajoute la liste des matchs en fonction des clics de l'utilisateur
     let number = chosen_team.length
     let i = 1+(-1)**(number%2)
@@ -147,21 +349,18 @@ undo_button.addEventListener("click", function(event){
         let last_team_chosen = chosen_team.pop()
         let selecteur = "."+last_team_chosen.textContent
         let colorChange = document.querySelectorAll(selecteur)
-
+        // Pour enlever le surlignage
         colorChange.forEach(function (element){
             let chosen_team_text = []
             chosen_team.forEach(function(button){
                 chosen_team_text.push(button.textContent)
             })
-            console.log(element.classList)
             if(element.classList.length === 3) {
                 let team_test = "defaut"
                 if (element.classList[1] === last_team_chosen.textContent) {
                     team_test = element.classList[2]
-                    console.log(team_test)
                 } else {
                     team_test = element.classList[1]
-                    console.log(team_test)
                 }
                 if (!(chosen_team_text.includes(team_test))) {
                     element.style.backgroundColor = "transparent"
@@ -194,8 +393,7 @@ undo_button.addEventListener("click", function(event){
         let j = Math.floor((number-1)/2)
         let cell = document.getElementById(String(j)+"_"+String(i))
         cell.textContent= default_cell_match
-        //let sectionDeleted = document.getElementById("container "+String(chosen_team.length+1))
-        //sectionDeleted.remove()
+        change_all()
     }
 })
 
@@ -207,31 +405,36 @@ let vide = document.createElement("th")
 team_line.appendChild(vide)
 Winners.forEach(function(name){
     let team = document.createElement("th")
-    team.textContent = name
+    team.textContent = change_bySpace(name)
     team.className = "team-cell " + name  // ajoute une classe pour que la cellule s'illumine quand équipe sélectionnée
     team_line.appendChild(team)
 })
 team_line.className = "team-line"
 table.appendChild(team_line)
-// Rempli le reste du tableau par des nombres arbitraire pour l'instant
+// Rempli le reste du tableau par les probas initiales
 for(let i=0; i<Runners_up.length; i++){
     let line = document.createElement("tr")
     for(let j=0;j<Winners.length+1;j++){
         if(j===0) {
             let team = document.createElement("td")
-            team.textContent = Runners_up[i]
+            team.textContent = change_bySpace(Runners_up[i])
             team.className = "cell-team " + Runners_up[i] // ajoute une classe pour que la cellule s'illumine quand équipe sélectionnée
             line.appendChild(team)
         }else{
             let cell = document.createElement("td")
-            cell.textContent = String(i)+String(j)
+            // cell.textContent = String(i)+String(j)   // ce que je faisais avant de mettre les probas
+            // code pour l'id des cellules de proba: runners_up en premier, puis winner séparé par un espace
+            cell.id =  Runners_up[i]+" "+ Winners[j-1]
             cell.className = "proba-cell " + Winners[j-1] +" "+ Runners_up[i] // ajoute une classe pour que la cellule s'illumine quand équipe sélectionnée
+            change_proba(cell,"('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')",change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
+            // console.log(change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
             line.appendChild(cell)
         }
     }
     line.className = "proba-line"
     table.appendChild(line)
 }
+
 
 /* Différente manière de changer la valeur des boutons
 boutons.forEach(function(bouton){
