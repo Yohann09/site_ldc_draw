@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
     // Modifiez le contenu du titre
-    monTitre.textContent = "Tirage UCL";
+    monTitre.textContent = "Tirage";
 });
 
 // Sélectionnez le conteneur des boutons
@@ -156,7 +156,6 @@ function change_bySpace(word){
 function change_proba(cell,index,index2){
     if(cell){
         let nombre = resultat[index][index2]
-        console.log(nombre)
         nombre = 100*nombre
         cell.textContent = String(nombre.toFixed(2))+"%"
     }else{
@@ -164,19 +163,57 @@ function change_proba(cell,index,index2){
     }
 }
 
+function verif_zero(){
+    for(let i=0;i<Winners.length;i++){
+        for(let j=0;j<Runners_up.length;j++){
+            let id = Runners_up[i]+" "+Winners[j]
+            let cell = document.getElementById(id)
+            let content = cell.textContent
+            let number = parseFloat(content.slice(0,-1))
+            if(number===0){
+                cell.style.backgroundColor = "rgba(138, 138, 138, 0.52)"
+            }
+        }
+    }
+    let max_index;
+    if(chosen_team.length%2===0){max_index=chosen_team.length}
+    else{max_index=chosen_team.length-1}
+    for(let i=0;i<max_index/2;i++){
+        let id = chosen_team[2*i].textContent+" "+chosen_team[2*i+1].textContent
+        let cell = document.getElementById(id)
+        cell.style.backgroundColor = "#50f3db"
+        cell.textContent= "Match"
+    }
+}
+
 function change_graphism(){
     // Illumine la colonne en jaune
     if(chosen_team.length%2===1){
-        for(let j=chosen_team.length-2;j<chosen_team.length;j++){
-            let bouton = chosen_team[j]
-            let selecteur = "."+bouton.textContent
-            let colorChange = document.querySelectorAll(selecteur)
-            colorChange.forEach(function (element){
-                element.style.backgroundColor = "rgba(253,253,104,0.82)"
-            })
+        let last_team = chosen_team[chosen_team.length-1]
+        let selecteur = "."+last_team.textContent
+        let colorChange = document.querySelectorAll(selecteur)
+        colorChange.forEach(function (element){
+            element.style.backgroundColor = "rgba(253,253,104,0.82)"
+        })
+        if(chosen_team.length>1){
+            for(let i=0; i<chosen_team.length-1;i++){
+                let bouton = chosen_team[i]
+                let selecteur = "."+bouton.textContent
+                let colorChange = document.querySelectorAll(selecteur)
+                let j=0
+                colorChange.forEach(function (element){
+                    if(j>0){
+                        element.style.backgroundColor = "transparent"
+                        element.textContent = "0.00%"
+                    }else{
+                        element.style.backgroundColor = "transparent"
+                    }
+                    j++
+                })
+            }
         }
     }else{
-        for(let j=chosen_team.length-2;j<chosen_team.length;j++){
+        for(let j=0;j<chosen_team.length;j++){
             let bouton = chosen_team[j]
             let selecteur = "."+bouton.textContent
             let colorChange = document.querySelectorAll(selecteur)
@@ -195,29 +232,28 @@ function change_graphism(){
 }
 
 function remove(list,elt_to_delete){
-    list.splice(list.indexOf(elt_to_delete), 1)
+    let index = list.indexOf(elt_to_delete)
+    list.splice(index, 1)
 }
 function remove_from_list(){ // Utilise les variables globales
     let runner = []
     let winner = []
     let max_index;
-    runners_resultat.forEach(function(name){
+    runners_resultat.forEach(function(name){    // On copie les listes
         runner.push(name)
     })
     winners_resultat.forEach(function(name){
         winner.push(name)
     })
-    console.log("chosen team length: " + chosen_team.length)
     if(chosen_team.length%2 === 1){max_index = chosen_team.length-1}
     else{max_index = chosen_team.length}
     for(let i=0;i<max_index;i++) {
-        //console.log("valeur de i" + String(i))
-        let name = chosen_team[i].textContent
+        let name = change_bySpace(chosen_team[i].textContent)
         if (runner.includes(name)) {
             remove(runner, name)
         } else if (winner.includes(name)) {
             remove(winner, name)
-        }
+        }else{console.log("on est dans le else avec: "+name)}
     }
     let index = "('" + runner[0] + "'"
     for(let i=1;i<runner.length-1;i++){
@@ -245,9 +281,9 @@ function change_all(){
             let id = Runners_up[i]+" "+Winners[j]
             let cell = document.getElementById(id)
             let index = remove_from_list()
-            console.log(index)
+            //console.log(index)
             let index2 = give_index2(Winners[j],Runners_up[i])
-            console.log(index2)
+            // console.log(index2)
             change_proba(cell,index,index2)
         }
     }
@@ -257,25 +293,34 @@ function change_all(){
 let tableMatch = document.getElementById("match-table")
 let tableTitle = document.createElement("caption")
 tableTitle.textContent = "Matchs"
-tableMatch.appendChild(tableTitle)
-for(let i=0;i<Winners.length;i++){
+//tableMatch.insertBefore(tableTitle,tableMatch)
+for(let i=-1;i<Winners.length;i++){
     let new_line = document.createElement("tr")
-    for(let j=0;j<3;j++){
-        if(j===1){
-            let new_cell = document.createElement("td")
-            new_cell.textContent = " VS "
-            new_line.appendChild(new_cell)
-        }else{
-            let new_cell = document.createElement("td")
-            new_cell.textContent = default_cell_match
-            // id pour récupérer ensuite la cellule et en modifier le contenu
-            new_cell.id = String(i) +"_"+ String(j)
-            new_cell.className = "cell-match-table"
-            new_line.appendChild(new_cell)
+    if(i===-1){
+        let new_cell = document.createElement("td")
+        new_cell.textContent = "Matchs"
+        new_cell.style.backgroundColor = "lightblue"
+        new_cell.style.textAlign = 'center';
+        new_line.appendChild(new_cell)
+        tableMatch.appendChild(new_line)
+    }else {
+        for (let j = 0; j < 3; j++) {
+            if (j === 1) {
+                let new_cell = document.createElement("td")
+                new_cell.textContent = " VS "
+                new_line.appendChild(new_cell)
+            } else {
+                let new_cell = document.createElement("td")
+                new_cell.textContent = default_cell_match
+                // id pour récupérer ensuite la cellule et en modifier le contenu
+                new_cell.id = String(i) + "_" + String(j)
+                new_cell.className = "cell-match-table"
+                new_line.appendChild(new_cell)
+            }
         }
+        new_line.className = "line-match-table"
+        tableMatch.appendChild(new_line)
     }
-    new_line.className = "line-match-table"
-    tableMatch.appendChild(new_line)
 }
 
 // Fonction qui ajoute les équipes au tableau et change les boutons affichés
@@ -285,7 +330,7 @@ function add_team_to_list_match(bouton){
     let other_list=[]
     if(boutons_winners.includes(bouton)){  // if affichage_winners
         list = boutons_winners
-        other_list = boutons_runner     // Peut aussi se faire avec affichage_winners dans la condition
+        other_list = boutons_runner    // Peut aussi se faire avec affichage_winners dans la condition
     }else{
         list = boutons_runner
         other_list = boutons_winners
@@ -299,7 +344,6 @@ function add_team_to_list_match(bouton){
     other_list.forEach(function(button){
         // Si la proba du texte de ce button avec le dernier choisi: bouton est de 0 alors on n'affiche pas le button
         // car le match ne peut pas avoir lieu et donc pas de calcul de proba
-        console.log(bouton.textContent)
         if(affichage_winners) {  // on vérifie que le bouton est un runner, dans ce cas on peut pas afficher tous les winners
             let cellule = document.getElementById(bouton.textContent+" "+button.textContent)
             let proba = parseFloat(cellule.textContent)
@@ -311,7 +355,9 @@ function add_team_to_list_match(bouton){
     })
     chosen_team.push(bouton)    // Rajoute l'équipe dans les équipes choisies
     // J'actualise toutes les probas
-    change_all()
+    if(chosen_team.length<Runners_up.length+Winners.length-3) {
+        change_all()
+    }
     change_graphism()
     // Ajoute la liste des matchs en fonction des clics de l'utilisateur
     let number = chosen_team.length
@@ -319,6 +365,7 @@ function add_team_to_list_match(bouton){
     let j = Math.floor((number-1)/2)
     let cell = document.getElementById(String(j)+"_"+String(i))
     cell.textContent=bouton.textContent
+    verif_zero()
 }
 // Fait disparaître les boutons quand on clique dessus et les ajoute à liste des matchs
 for(let i=0; i<boutons_winners.length; i++) {
@@ -394,6 +441,8 @@ undo_button.addEventListener("click", function(event){
         let cell = document.getElementById(String(j)+"_"+String(i))
         cell.textContent= default_cell_match
         change_all()
+        change_graphism()
+        verif_zero()
     }
 })
 
@@ -426,14 +475,15 @@ for(let i=0; i<Runners_up.length; i++){
             // code pour l'id des cellules de proba: runners_up en premier, puis winner séparé par un espace
             cell.id =  Runners_up[i]+" "+ Winners[j-1]
             cell.className = "proba-cell " + Winners[j-1] +" "+ Runners_up[i] // ajoute une classe pour que la cellule s'illumine quand équipe sélectionnée
+            console.log(cell.id)
             change_proba(cell,"('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')",change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
-            // console.log(change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
             line.appendChild(cell)
         }
     }
     line.className = "proba-line"
     table.appendChild(line)
 }
+verif_zero()
 
 
 /* Différente manière de changer la valeur des boutons

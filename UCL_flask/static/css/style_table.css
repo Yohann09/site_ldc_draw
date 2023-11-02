@@ -48,6 +48,7 @@
 #table-container{ /* Contenant des deux tableaux*/
     display : flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
     font-size: 120%;
