@@ -7,13 +7,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style_table.css') }}">
     <h1 id = "mon-titre">Test des boutons d'équipes</h1>
     <div id="table-container">  <!-- section qui contient les deux tableaux-->
-        <table id="match-table"></table>
-        <table id="proba-table"></table>  <!-- On crée le tableau avec les probas dans main.js-->
+        <table id="match-table">
+            <caption id="match-table-title">MATCHS</caption>
+        </table>
+        <div id="proba-container">
+            <table id="proba-table"></table>  <!-- On crée le tableau avec les probas dans main.js-->
+        </div>
     </div>
     <!-- tentative de création d'un tableau pour tout afficher-->
     <!-- _____________ -->
     <div id = "bouton-container">
-        <button id="undo">Undo</button>
     </div>
     <!-- ____________ -->
     <footer id="footer">
