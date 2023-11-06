@@ -51,14 +51,14 @@ def proba():
 """liste_equipe = {'equipe1': {'nom': 'Équipe 1', 'ville': 'Ville 1', 'couleur': 'Rouge'},
                 'equipe2': {'nom': 'Équipe 2', 'ville': 'Ville 2', 'couleur': 'Bleu'},
                 'equipe3': {'nom': 'Équipe 3', 'ville': 'Ville 3', 'couleur': 'Vert'}
-}"""
+}
 
 liste_equipe= {}
 for team in LDC.teams:
     liste_equipe["nom"] = team.name()
     liste_equipe["country"] = team.country()
     liste_equipe["group"] = team.group()
-    liste_equipe["rank"] = team.rank()
+    liste_equipe["rank"] = team.rank()"""
 
 # fonction pour lancer le site quand on exécute ce fichier
 if __name__ == '__main__':
