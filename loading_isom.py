@@ -127,6 +127,9 @@ class GraphBipartite:
         self.last_runner_drawn = runner
 
     def convert(self):
+        # transformer le graph en matrice de 0 et de 1
+        # 1 si le ieme winner et le jieme runner up sont voisin
+        # 0 sinon
         matrix = []
         i = 0
         for winner in self.winners():
@@ -140,13 +143,18 @@ class GraphBipartite:
         return matrix
 
     def sort_rows(self, matrix, permutation):
+        # tri les lignes en fontion du score de chacune
         scores = []
-        perm = permutation.copy()
+        perm = []
+        for k in permutation:
+            perm.append(k)
         for i in range(len(matrix)):
+            # calcul du score pour chaque ligne
             sum = 0
             for j in range(len(matrix[0])):
                 sum += matrix[i][j] * (2**j)
             scores.append(sum)
+        # tri de score avec enregistrement des permutations
         for i in range(1, len(scores)):
             current_element = scores[i]
             current_perm = perm[i]
@@ -157,25 +165,25 @@ class GraphBipartite:
                 j -= 1
             scores[j + 1] = current_element
             perm[j + 1] = current_perm
-        # print(scores)
-        # print(perm)
-        # print(permutation)
         res = []
         for i in range(len(matrix)):
             for k in range(len(matrix)):
                 if perm[i] == permutation[k]:
                     res.append(matrix[k])
+        # renvoie la matrice triée et les permutations
         return res, perm
 
     def sort_col(self, matrix, permutation):
+        # pareil avec les colonnes
         scores = []
-        perm = permutation.copy()
+        perm = []
+        for k in permutation:
+            perm.append(k)
         for j in range(len(matrix[0])):
             sum = 0
             for i in range(len(matrix)):
                 sum += matrix[i][j] * (2**i)
             scores.append(sum)
-        # print(scores)
         for i in range(1, len(scores)):
             current_element = scores[i]
             current_perm = perm[i]
@@ -186,8 +194,6 @@ class GraphBipartite:
                 j -= 1
             scores[j + 1] = current_element
             perm[j + 1] = current_perm
-        # print(scores)
-        # print(perm)
         res = []
         for i in range(len(matrix)):
             res.append([])
@@ -199,6 +205,8 @@ class GraphBipartite:
         return res, perm
 
     def resort(self, matrix, permutation_rows, permutation_cols):
+        # retrie la matrice isom
+        # on s'en sert pas mais ça peut être utile
         mat = matrix.copy()
         if len(permutation_cols) != len(permutation_rows):
             print("prblm taille")
@@ -249,26 +257,24 @@ class GraphBipartite:
         return ind
 
     def isom(self, matrix):
+        # calcule la matrice de l'isomorphisme
+        # avec les fonctions de tri
         permutation_rows = [[i for i in range(len(matrix))]]
         permutation_cols = [[i for i in range(len(matrix))]]
         end = False
-        mat1 = matrix.copy()
+        mat1 = []
+        for k in matrix:
+            mat1.append(k)
         while end is False:
             rows = permutation_rows[-1].copy()
             cols = permutation_cols[-1].copy()
-            # print(mat1)
-            # print(permutation_rows[-1])
             mat2, permrows = self.sort_rows(mat1, permutation_rows[-1])
-            # print(mat2)
             mat3, permcols = self.sort_col(mat2, permutation_cols[-1])
-            # print(mat3)
             permutation_rows.append(permrows)
             permutation_cols.append(permcols)
-            mat1 = mat3.copy()
-            # print(mat1)
-            # print(permutation_rows)
-            # print(permutation_cols)
-            # print(' ')
+            mat1 = []
+            for k in mat3:
+                mat1.append(k)
             end = True
             for i in range(len(rows)):
                 if rows[i] != permutation_rows[-1][i]:
@@ -276,11 +282,13 @@ class GraphBipartite:
             for i in range(len(cols)):
                 if cols[i] != permutation_cols[-1][i]:
                     end = False
-        q = 0
-        for i in range(len(matrix)):
-            for j in range(len(matrix)):
-                q += mat1[i][j] * (2**(i+j))
-        return q, mat1, permutation_rows, permutation_cols
+        # renvoie la matrice et toutes les permutations
+        binary_string = ''
+        for row in mat1:
+            for element in row:
+                binary_string += str(element)
+        q = int(binary_string, 2)
+        return q, permutation_rows, permutation_cols
 
     def admissible_opponents(self, runner_up):
         if self.length() > 2:
@@ -313,99 +321,66 @@ class GraphBipartite:
         else:
             return self.winners()
 
-    def proba_cond(self, i, j, i_0, dictionnary1, dictionary2):
-        key3 = f"{self.runners_up()}, {self.winners()}"
-        key4 = f"{i}, {j}, {i_0}"
-        if key3 in dictionnary1 and key4 in dictionnary1[key3]:
-            return dictionnary1[key3][key4]
+    def proba_cond(self, i, j, i_0, dictionary2):
         matrix = self.convert()
-        q, mat1, permutation_rows, permutation_cols = self.isom(matrix)
+        q, permutation_rows, permutation_cols = self.isom(matrix)
         runner = self.index_eq_runner(i, permutation_cols)
         winner = self.index_eq_winner(j, permutation_rows)
         draw = self.index_eq_runner(i_0, permutation_cols)
-        key = f"{mat1}"
+        key = f"{q}"
         key2 = f"{runner}, {winner}, {draw}"
-        if key in dictionnary2 and key2 in dictionnary2[key]:
-            print("merci")
-            return dictionnary2[key][key2]
-        else:
-            adm_opp_i0 = self.admissible_opponents(i_0)
-            if self.length() > 2:
-                if i == i_0:
-                    if j in adm_opp_i0:
-                        res = 1/len(adm_opp_i0)
-                        if key in dictionnary2:
-                            dictionnary2[key][key2] = res
-                        else:
-                            dictionnary2[key] = {}
-                            dictionnary2[key][key2] = res
-                        if key3 in dictionnary1:
-                            dictionnary1[key3][key4] = res
-                        else:
-                            dictionnary1[key3] = {}
-                            dictionnary1[key3][key4] = res
-                        return res
-                    else:
-                        if key in dictionnary2:
-                            dictionnary2[key][key2] = 0
-                        else:
-                            dictionnary2[key] = {}
-                            dictionnary2[key][key2] = 0
-                        if key3 in dictionnary1:
-                            dictionnary1[key3][key4] = 0
-                        else:
-                            dictionnary1[key3] = {}
-                            dictionnary1[key3][key4] = 0
-                        return 0
-                else:
-                    prob = 0
-                    for j_0 in self.graph()[i_0][1:]:
-                        if j_0 != j and j_0 in adm_opp_i0:
-                            G_2 = self.copy_graph()
-                            G_2.remove_2t(i_0, j_0)
-                            prob += G_2.proba(i, j, dictionnary1,
-                                              dictionary2)/len(adm_opp_i0)
-                        else:
-                            prob += 0
+        adm_opp_i0 = self.admissible_opponents(i_0)
+        if self.length() > 2:
+            if i == i_0:
+                if j in adm_opp_i0:
+                    res = 1/len(adm_opp_i0)
                     if key in dictionnary2:
-                        dictionnary2[key][key2] = prob
+                        dictionnary2[key][key2] = res
                     else:
                         dictionnary2[key] = {}
-                        dictionnary2[key][key2] = prob
-                    if key3 in dictionnary1:
-                        dictionnary1[key3][key4] = prob
-                    else:
-                        dictionnary1[key3] = {}
-                        dictionnary1[key3][key4] = prob
-                    return prob
-            else:
-                if i == i_0:
-                    if j in adm_opp_i0:
-                        if key in dictionnary2:
-                            dictionnary2[key][key2] = 1
-                        else:
-                            dictionnary2[key] = {}
-                            dictionnary2[key][key2] = 1
-                        if key3 in dictionnary1:
-                            dictionnary1[key3][key4] = 1
-                        else:
-                            dictionnary1[key3] = {}
-                            dictionnary1[key3][key4] = 1
-                        return 1
-                    else:
-                        if key in dictionnary2:
-                            dictionnary2[key][key2] = 0
-                        else:
-                            dictionnary2[key] = {}
-                            dictionnary2[key][key2] = 0
-                        if key3 in dictionnary1:
-                            dictionnary1[key3][key4] = 0
-                        else:
-                            dictionnary1[key3] = {}
-                            dictionnary1[key3][key4] = 0
-                        return 0
+                        dictionnary2[key][key2] = res
+                    return res
                 else:
-                    print("problem")
+                    if key in dictionnary2:
+                        dictionnary2[key][key2] = 0
+                    else:
+                        dictionnary2[key] = {}
+                        dictionnary2[key][key2] = 0
+                    return 0
+            else:
+                prob = 0
+                for j_0 in self.graph()[i_0][1:]:
+                    if j_0 != j and j_0 in adm_opp_i0:
+                        G_2 = self.copy_graph()
+                        G_2.remove_2t(i_0, j_0)
+                        prob += G_2.proba(i, j, dictionnary1,
+                                          dictionary2)/len(adm_opp_i0)
+                    else:
+                        prob += 0
+                if key in dictionnary2:
+                    dictionnary2[key][key2] = prob
+                else:
+                    dictionnary2[key] = {}
+                    dictionnary2[key][key2] = prob
+                return prob
+        else:
+            if i == i_0:
+                if j in adm_opp_i0:
+                    if key in dictionnary2:
+                        dictionnary2[key][key2] = 1
+                    else:
+                        dictionnary2[key] = {}
+                        dictionnary2[key][key2] = 1
+                    return 1
+                else:
+                    if key in dictionnary2:
+                        dictionnary2[key][key2] = 0
+                    else:
+                        dictionnary2[key] = {}
+                        dictionnary2[key][key2] = 0
+                    return 0
+            else:
+                print("problem")
 
     def proba(self, i, j, dictionnary1, dictionnary2):
         key3 = f"{self.runners_up(), self.winners()}"
@@ -413,17 +388,17 @@ class GraphBipartite:
         if key3 in dictionnary1 and key4 in dictionnary1[key3]:
             return dictionnary1[key3][key4]
         matrix = self.convert()
-        q, mat1, permutation_rows, permutation_cols = self.isom(matrix)
+        q, permutation_rows, permutation_cols = self.isom(matrix)
         runner = self.index_eq_runner(i, permutation_cols)
         winner = self.index_eq_winner(j, permutation_rows)
-        key = f"{mat1}"
+        key = f"{q}"
         key2 = f"{runner}, {winner}"
         if key in dictionnary2 and key2 in dictionnary2[key]:
             return dictionnary2[key][key2]
         else:
             sum = 0
             for i_0 in self.runners_up():
-                sum += self.proba_cond(i, j, i_0, dictionnary1, dictionnary2)
+                sum += self.proba_cond(i, j, i_0, dictionnary2)
             res = sum/len(self.runners_up())
             if key in dictionnary2:
                 dictionnary2[key][key2] = res
@@ -457,7 +432,7 @@ class GraphBipartite:
                     table[i].append(round(self.proba_cond(
                         self.runners_up()[j - 1], self.winners()[i - 1],
                                     self.last_runner_drawn,
-                                    dictionnary1, dictionnary2)*100, 2))
+                                    dictionnary2)*100, 2))
         matrix = np.array(table, dtype=object)
         return matrix
 
@@ -514,30 +489,13 @@ dictionnary2 = {}
 dictionnary1 = {}
 
 print(G_init.matrix(dictionnary1, dictionnary2))
-print(len(dictionnary2))
+
+for key in dictionnary2:
+    for key2 in dictionnary2[key]:
+        dictionnary2[key][key2] = round(dictionnary2[key][key2]*100, 2)
+
 with open("isom.json", 'w') as fichier:
     json.dump(dictionnary2, fichier)
 
 with open("probas.json", 'w') as fichier:
     json.dump(dictionnary1, fichier)
-
-# print(len(dictionnary))
-# suu = [[1, 1, 0, 0], [0, 0, 0, 1], [0, 1, 0, 1], [1, 0, 1, 1]]
-# print(q)
-# print(mat1)
-# print(permutation_rows)
-# print(permutation_cols)
-# print(G_init.runners_up())
-# print(G_init.index_eq_runner("Liverpool", permutation_cols))
-# print(G_init.index_eq_winner("Chelsea", permutation_rows))
-# print(G_init.admissible_opponents("Liverpool"))
-# print(G_init.proba("Liverpool", "Chelsea", dictionnary))
-# print(G_init.sort_col(suu, [0, 1, 2, 3]))
-# res = G_init.resort(matrix, permutation_rows, permutation_cols)
-# print(res)
-# print(G_init.proba_cond("Liverpool", "Chelsea", "Frankfurt", dictionnary))
-# print(G_init.admissible_opponents("Dortmund"))
-# print(G_init.proba("Liverpool", "Chelsea", dictionnary))
-# print(G_init.proba_cond("Liverpool", "Chelsea", "Frankfurt", dictionnary))
-# print(dictionnary["212"]["0, 2"])
-# print(G_init.proba_cond("Liverpool", "Chelsea", "Frankfurt", dictionnary))

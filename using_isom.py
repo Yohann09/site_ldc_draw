@@ -123,6 +123,9 @@ class GraphBipartite:
         self.last_runner_drawn = runner
 
     def convert(self):
+        # transformer le graph en matrice de 0 et de 1
+        # 1 si le ieme winner et le jieme runner up sont voisin
+        # 0 sinon
         matrix = []
         i = 0
         for winner in self.winners():
@@ -136,13 +139,18 @@ class GraphBipartite:
         return matrix
 
     def sort_rows(self, matrix, permutation):
+        # tri les lignes en fontion du score de chacune
         scores = []
-        perm = permutation.copy()
+        perm = []
+        for k in permutation:
+            perm.append(k)
         for i in range(len(matrix)):
+            # calcul du score pour chaque ligne
             sum = 0
             for j in range(len(matrix[0])):
                 sum += matrix[i][j] * (2**j)
             scores.append(sum)
+        # tri de score avec enregistrement des permutations
         for i in range(1, len(scores)):
             current_element = scores[i]
             current_perm = perm[i]
@@ -153,25 +161,25 @@ class GraphBipartite:
                 j -= 1
             scores[j + 1] = current_element
             perm[j + 1] = current_perm
-        # print(scores)
-        # print(perm)
-        # print(permutation)
         res = []
         for i in range(len(matrix)):
             for k in range(len(matrix)):
                 if perm[i] == permutation[k]:
                     res.append(matrix[k])
+        # renvoie la matrice triée et les permutations
         return res, perm
 
     def sort_col(self, matrix, permutation):
+        # pareil avec les colonnes
         scores = []
-        perm = permutation.copy()
+        perm = []
+        for k in permutation:
+            perm.append(k)
         for j in range(len(matrix[0])):
             sum = 0
             for i in range(len(matrix)):
                 sum += matrix[i][j] * (2**i)
             scores.append(sum)
-        # print(scores)
         for i in range(1, len(scores)):
             current_element = scores[i]
             current_perm = perm[i]
@@ -182,8 +190,6 @@ class GraphBipartite:
                 j -= 1
             scores[j + 1] = current_element
             perm[j + 1] = current_perm
-        # print(scores)
-        # print(perm)
         res = []
         for i in range(len(matrix)):
             res.append([])
@@ -193,6 +199,30 @@ class GraphBipartite:
                     for i in range(len(res)):
                         res[i].append(matrix[i][k])
         return res, perm
+
+    def resort(self, matrix, permutation_rows, permutation_cols):
+        # retrie la matrice isom
+        # on s'en sert pas mais ça peut être utile
+        mat = matrix.copy()
+        if len(permutation_cols) != len(permutation_rows):
+            print("prblm taille")
+        else:
+            while len(permutation_rows) > 1:
+                mat1 = [[] for k in range(len(matrix))]
+                for k in range(len(permutation_cols[0])):
+                    for t in range(len(permutation_cols[0])):
+                        if permutation_cols[-2][k] == permutation_cols[-1][t]:
+                            for line in range(len(mat1)):
+                                mat1[line].append(mat[line][t])
+                mat2 = []
+                for k in range(len(permutation_rows[0])):
+                    for t in range(len(permutation_rows[0])):
+                        if permutation_rows[-2][k] == permutation_rows[-1][t]:
+                            mat2.append(mat1[t])
+                mat = mat2.copy()
+                permutation_cols.pop(-1)
+                permutation_rows.pop(-1)
+        return mat
 
     def index_runner(self, runner):
         for k in range(len(self.runners_up())):
@@ -223,26 +253,24 @@ class GraphBipartite:
         return ind
 
     def isom(self, matrix):
+        # calcule la matrice de l'isomorphisme
+        # avec les fonctions de tri
         permutation_rows = [[i for i in range(len(matrix))]]
         permutation_cols = [[i for i in range(len(matrix))]]
         end = False
-        mat1 = matrix.copy()
+        mat1 = []
+        for k in matrix:
+            mat1.append(k)
         while end is False:
             rows = permutation_rows[-1].copy()
             cols = permutation_cols[-1].copy()
-            # print(mat1)
-            # print(permutation_rows[-1])
             mat2, permrows = self.sort_rows(mat1, permutation_rows[-1])
-            # print(mat2)
             mat3, permcols = self.sort_col(mat2, permutation_cols[-1])
-            # print(mat3)
             permutation_rows.append(permrows)
             permutation_cols.append(permcols)
-            mat1 = mat3.copy()
-            # print(mat1)
-            # print(permutation_rows)
-            # print(permutation_cols)
-            # print(' ')
+            mat1 = []
+            for k in mat3:
+                mat1.append(k)
             end = True
             for i in range(len(rows)):
                 if rows[i] != permutation_rows[-1][i]:
@@ -250,15 +278,17 @@ class GraphBipartite:
             for i in range(len(cols)):
                 if cols[i] != permutation_cols[-1][i]:
                     end = False
-        q = 0
-        for i in range(len(matrix)):
-            for j in range(len(matrix)):
-                q += mat1[i][j] * (2**(i+j))
-        return q, mat1, permutation_rows, permutation_cols
+        # renvoie la matrice et toutes les permutations
+        binary_string = ''
+        for row in mat1:
+            for element in row:
+                binary_string += str(element)
+        q = int(binary_string, 2)
+        return q, permutation_rows, permutation_cols
 
     def matrix(self, data):
         matrix = self.convert()
-        q, mat1, permutation_rows, permutation_cols = self.isom(matrix)
+        q, permutation_rows, permutation_cols = self.isom(matrix)
         table = []
         for i in range(len(self.winners()) + 1):
             table.append([])
@@ -267,7 +297,7 @@ class GraphBipartite:
             table[line].append(self.winners()[line - 1])
         for col in range(1, len(self.runners_up()) + 1):
             table[0].append(self.runners_up()[col - 1])
-        key1 = f"{mat1}"
+        key1 = f"{q}"
         runners = self.runners_up()
         winners = self.winners()
         for i in range(0, len(winners)):
@@ -279,14 +309,14 @@ class GraphBipartite:
                 if self.length() % 2 == 0:
                     key2 = f"{runner}, {winner}"
                     if key1 in data and key2 in data[key1]:
-                        table[j+1].append(round(data[key1][key2]*100, 2))
+                        table[j+1].append(data[key1][key2])
                     else:
                         print(f"not, {key1}, {key2}")
                 else:
                     key2 = \
                         f"{runner}, {winner}, {draw}"
                     if key1 in data and key2 in data[key1]:
-                        table[j+1].append(round(data[key1][key2]*100, 2))
+                        table[j+1].append(data[key1][key2])
         matrix = np.array(table, dtype=object)
         return matrix
 
