@@ -185,6 +185,7 @@ class GraphBipartite:
         key = f"{tuple(self.runners_up())}, {tuple(self.winners())}"
         key2 = f"{i}, {j}, {i_0}"
         if key in dictionnary and key2 in dictionnary[key]:
+            print("gouloum")
             return dictionnary[key][key2]
         else:
             adm_opp_i0 = self.admissible_opponents(i_0)
