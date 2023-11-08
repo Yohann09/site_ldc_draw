@@ -489,11 +489,7 @@ dictionnary2 = {}
 dictionnary1 = {}
 
 print(G_init.matrix(dictionnary1, dictionnary2))
-
-for key in dictionnary2:
-    for key2 in dictionnary2[key]:
-        dictionnary2[key][key2] = round(dictionnary2[key][key2]*100, 2)
-
+print(len(dictionnary2))
 with open("isom.json", 'w') as fichier:
     json.dump(dictionnary2, fichier)
 

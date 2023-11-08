@@ -271,6 +271,7 @@ class GraphBipartite:
             mat1 = []
             for k in mat3:
                 mat1.append(k)
+            mat1 = mat3.copy()
             end = True
             for i in range(len(rows)):
                 if rows[i] != permutation_rows[-1][i]:
@@ -362,15 +363,9 @@ for team1 in winners:
                 and team1.group() != team2.group() \
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
-# G_init.remove_2t("PSG", "Bayern")
-# G_init.remove_2t("AC Milan", "Benfica")
-# G_init.remove_2t("Frankfurt", "Porto")
-# G_init.remove_2t("Inter", "Manchester City")
-# G_init.remove_2t("Leipzig", "Napoli")
-# G_init.remove_1t("Dortmund")
 
-with open("isom.json", 'r') as fichier:
+with open("static/isom.json", 'r') as fichier:
     donnees = json.load(fichier)
 
 M = G_init.matrix(donnees)
-print((M))
+#print((M))

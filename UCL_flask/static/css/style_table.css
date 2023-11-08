@@ -56,6 +56,8 @@
     background-color: rgba(253, 58, 58, 0.82);
 }
 
+/* ----------------- Boutons des options ------------------ */
+
 #options-container{
     display: flex;
     justify-content: flex-start;
@@ -80,7 +82,17 @@
     border-radius: 5px;
     border: none;
     margin-left: 2.5em;
+}
 
+#restart-button{
+    background-color: #ff0000;
+    order: 1;
+    border-radius: 5px;
+    width: 5em;
+    height: 3em;
+    border-radius: 5px;
+    border: none;
+    margin-left: 2.5em;
 }
 
 /* -------------------- Affichage des tableaux ------------------------- */

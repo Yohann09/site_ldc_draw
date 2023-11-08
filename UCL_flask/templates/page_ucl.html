@@ -6,14 +6,14 @@
 {% block content %}
     <h1>Test de création d'un formulaire:</h1>
     <p>Texte avant le formulaire</p>
-    <form method="POST" action="/calculate">
+    <form method="POST" action="/proba">
     <p>
-        <input type = "number" name="num" placeholder="Numérateur">
-        <input type = "number" name="denom" placeholder="Dénominateur">
+        <input type = "string" name="team1" placeholder="Team 1">
+        <input type = "string" name="team2" placeholder="Team 2">
         <button type="submit">Calculer</button>
     </p>
 </form>
-    <p>Résultat : {{ result }}</p>
+    <p>Proba correspondante : {{ result }}</p>
 
 {% endblock %}
 

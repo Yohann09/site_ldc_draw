@@ -1,5 +1,10 @@
-// Test du chargement des probas:
 
+/*
+    Fichier où j'essaie d'utiliser le fichier de résultat isom
+*/
+
+// Test du chargement des probas:
+/*
 let xhr = new XMLHttpRequest();
 xhr.overrideMimeType("application/json");
 xhr.open("GET", "/static/resultat.json", false); // Notez-le "false" pour le mode synchrone
@@ -13,7 +18,7 @@ if (xhr.status === 200) {
   // console.log(resultat);
 } else {
   console.error('Erreur de chargement du fichier JSON');
-}
+}*/
 
 //console.log(resultat["('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')"]["Brugge, Napoli, Dortmund"])
 
@@ -99,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
     // Modifiez le contenu du titre
-    monTitre.textContent = "Tirage";
+    monTitre.textContent = "Tirage test isom";
 });
 
 // Sélectionne le conteneur des boutons des équipes
@@ -164,14 +169,57 @@ function changeSpaceby_(word){
 }
 
 // Fonction qui change la valeur de la cellule
-function change_proba(cell,index,index2){
-    if(cell){
-        let nombre = resultat[index][index2]
-        //nombre = 100*nombre
-        cell.textContent = String(nombre)//.toFixed(2))+"%"
-    }else{
-        console.log("erreur dans change proba")
-    }
+function change_proba(cell,index,index2, aff_cond){
+    fetch('/proba', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'team_to_remove': index, 'teams_match': index2})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.resultat) {
+                    let nombre = data.resultat
+                    if(nombre===-2){
+                    cell.textContent = String(0)+"%"
+                    }else{
+                    //nombre = 100*nombre
+                    cell.textContent = String(nombre)+"%"//.toFixed(2))+"%"
+                    }
+                } else {
+                    cell.textContent = 'Erreur';
+                }
+            });
+}
+
+function proba_hybride(){
+    let index= []
+    chosen_team.forEach(function (button){
+        index.push(change_bySpace(button.textContent))
+    })
+    fetch('/proba_all', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'team_to_remove': index })
+    })
+    .then(response => response.json())
+            .then(data => {
+                if (data.resultat) {
+                    let dict = data.resultat
+                    for (let i = 0; i < Winners.length; i++) {
+                        for (let j = 0; j < Runners_up.length; j++) {
+                            let id = Runners_up[i] + " " + Winners[j]
+                            let cell = document.getElementById(id)
+                            console.log(runners_resultat[i]+winners_resultat[j] + ": "+dict[runners_resultat[i]][winners_resultat[j]])
+                            cell.textContent = String(dict[runners_resultat[i]][winners_resultat[j]]) + "%"
+                        }
+                    }
+                }
+                verif_zero()
+            })
 }
 
 function verif_zero(){
@@ -181,6 +229,7 @@ function verif_zero(){
             let cell = document.getElementById(id)
             let content = cell.textContent
             let number = parseFloat(content.slice(0,-1))
+            console.log(number)
             if(number===0){
                 cell.style.backgroundColor = "rgb(182,182,182)"
             }
@@ -247,56 +296,37 @@ function remove(list,elt_to_delete){
     list.splice(index, 1)
 }
 function remove_from_list(){ // Utilise les variables globales
-    let runner = []
-    let winner = []
-    let max_index;
-    runners_resultat.forEach(function(name){    // On copie les listes
-        runner.push(name)
+    let runner_winner= []
+    chosen_team.forEach(function (button){
+        runner_winner.push(change_bySpace(button.textContent))
     })
-    winners_resultat.forEach(function(name){
-        winner.push(name)
-    })
-    if(chosen_team.length%2 === 1){max_index = chosen_team.length-1}
-    else{max_index = chosen_team.length}
-    for(let i=0;i<max_index;i++) {
-        let name = change_bySpace(chosen_team[i].textContent) // Normalement la liste sera déjà bien organisé
-        if (runner.includes(name)) {
-            remove(runner, name)
-        } else if (winner.includes(name)) {
-            remove(winner, name)
-        }else{console.log("on est dans le else avec: "+name)}
-    }
-    let index = "('" + runner[0] + "'"
-    for(let i=1;i<runner.length-1;i++){
-        index += ", '"+ runner[i]+"'"
-    }
-    index+= ", '"+runner[runner.length-1] +"'), ("
-    index += "'"+winner[0]+"'"
-    for(let i=1;i<winner.length-1;i++){
-        index += ", '"+ winner[i]+"'"
-    }
-    index+= ", '"+winner[winner.length-1] +"')"
-    return index
+    return runner_winner
 }
 
 function give_index2(winner,runner){ // Utilise des variables globales
-    let index2 = change_bySpace(runner)+", "+change_bySpace(winner);
+    let index2 = []
+    index2.push(change_bySpace(String(runner)))
+    index2.push(change_bySpace(String(winner)))
     if(affichage_winners){
-        index2+=", "+change_bySpace(chosen_team[chosen_team.length-1].textContent)
+        index2.push(change_bySpace(chosen_team[chosen_team.length-1].textContent))
     }
     return index2
 }
 function change_all(){
+    // Il faut que je fasse une fonction renvoyant les équipes à remove soit les équipes de chosen_team
+    // en enlevant peut être la dernière
     for(let i=0;i<Winners.length;i++){
         for(let j=0;j<Runners_up.length;j++){
             let id = Runners_up[i]+" "+Winners[j]
             let cell = document.getElementById(id)
             //console.log(cell.id)
-            let index = remove_from_list()
+            let index = remove_from_list() // renvoie la liste complète des équipes à remove dans proba_single
             //console.log(index)
             let index2 = give_index2(Winners[j],Runners_up[i])
             //console.log(index2)
-            change_proba(cell,index,index2)
+            let aff_cond = false;
+            if(chosen_team.length%2===1){aff_cond=true}
+            change_proba(cell,index,index2,aff_cond)
         }
     }
 }
@@ -357,7 +387,8 @@ function add_team_to_list_match(bouton){
     chosen_team.push(bouton)    // Rajoute l'équipe dans les équipes choisies
     // J'actualise toutes les probas
     if(chosen_team.length<Runners_up.length+Winners.length-3) {
-        change_all()
+        //change_all()
+        proba_hybride()
     }
     change_graphism()
     // Ajoute la liste des matchs en fonction des clics de l'utilisateur
@@ -451,7 +482,8 @@ undo_button.addEventListener("click", function(event){
         let j = Math.floor((number-1)/2)
         let cell = document.getElementById(String(j)+"_"+String(i))
         cell.textContent= default_cell_match
-        change_all()
+        //change_all()
+        proba_hybride()
         change_graphism()
         verif_zero()
     }
@@ -515,12 +547,15 @@ for(let i=0; i<Runners_up.length; i++){
             // code pour l'id des cellules de proba: runners_up en premier, puis winner séparé par un espace
             cell.id =  Runners_up[i]+" "+ Winners[j-1]
             cell.className = "proba-cell " + Winners[j-1] +" "+ Runners_up[i] // ajoute une classe pour que la cellule s'illumine quand équipe sélectionnée
-            change_proba(cell,"('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')",change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
+            //change_proba(cell,"('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')",change_bySpace(Runners_up[i])+", "+change_bySpace(Winners[j-1]))
+            cell.textContent = -1
             line.appendChild(cell)
         }
     }
     line.className = "proba-line"
     table.appendChild(line)
 }
+//change_all()
+proba_hybride()
 verif_zero()
 
