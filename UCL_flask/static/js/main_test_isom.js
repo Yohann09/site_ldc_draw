@@ -168,6 +168,7 @@ function changeSpaceby_(word){
     return new_word
 }
 
+
 // Fonction qui change la valeur de la cellule
 function change_proba(cell,index,index2, aff_cond){
     fetch('/proba', {
@@ -193,6 +194,20 @@ function change_proba(cell,index,index2, aff_cond){
             });
 }
 
+// Fonction asynchrone qui change les valeurs de toutes les cellules
+function proba_all(){
+    let index= []
+    chosen_team.forEach(function (button){
+        index.push(change_bySpace(button.textContent))
+    })
+    fetch('/proba_all', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'team_to_remove': index })
+    })
+}
 function proba_hybride(){
     let index= []
     chosen_team.forEach(function (button){

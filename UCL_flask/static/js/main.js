@@ -10,7 +10,6 @@ let resultat;
 if (xhr.status === 200) {
   resultat = JSON.parse(xhr.responseText);
   // Je peux maintenant utiliser myJSONData dans le reste du code
-  // console.log(resultat);
 } else {
   console.error('Erreur de chargement du fichier JSON');
 }
@@ -167,8 +166,8 @@ function changeSpaceby_(word){
 function change_proba(cell,index,index2){
     if(cell){
         let nombre = resultat[index][index2]
-        //nombre = 100*nombre
-        cell.textContent = String(nombre)//.toFixed(2))+"%"
+        nombre = 100*nombre
+        cell.textContent = String(nombre.toFixed(2))+"%"
     }else{
         console.log("erreur dans change proba")
     }
