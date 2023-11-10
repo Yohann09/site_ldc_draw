@@ -3,103 +3,7 @@
     Fichier où j'essaie d'utiliser le fichier de résultat isom
 */
 
-// Test du chargement des probas:
-/*
-let xhr = new XMLHttpRequest();
-xhr.overrideMimeType("application/json");
-xhr.open("GET", "/static/resultat.json", false); // Notez-le "false" pour le mode synchrone
-xhr.send();
-
-let resultat;
-
-if (xhr.status === 200) {
-  resultat = JSON.parse(xhr.responseText);
-  // Je peux maintenant utiliser myJSONData dans le reste du code
-  // console.log(resultat);
-} else {
-  console.error('Erreur de chargement du fichier JSON');
-}*/
-
-//console.log(resultat["('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')"]["Brugge, Napoli, Dortmund"])
-
-/*
-let jsonData = null;
-
-async function fetchData() {
-  try {
-    const response = await fetch("/static/resultat.json");
-    jsonData = await response.json();
-  } catch (error) {
-    console.error('Erreur de chargement du fichier JSON :', error);
-  }
-}
-
-async function main() {
-  if (jsonData === null) {
-    await fetchData();
-  }
-  return jsonData;
-}
-
-async function accederAuJson(indice,indice2) {
-  const resultat = await main();
-  const valeur = resultat[indice][indice2];
-  return valeur;
-}*/
-
-// Nouveau test
-/*
-function loadJSONFile(url, callback) {
-  let xhr = new XMLHttpRequest();
-  xhr.overrideMimeType("application/json");
-  xhr.open("GET", url, true);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      callback(JSON.parse(xhr.responseText));
-    }
-  };
-  xhr.send();
-}
-
-let myJSONData; // Variable pour stocker le JSON
-
-loadJSONFile("/static/resultat.json", function (data) {
-  myJSONData = data;
-  // Vous pouvez effectuer des opérations avec myJSONData ici
-    console.log(myJSONData)
-});
-console.log(myJSONData)*/
-// Test d'utilisation de la fonction accéder au JSON
-/*
-accederAuJson("('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')", "Brugge, Napoli, Dortmund")
-  .then(valeur => {
-    console.log(valeur);
-  })
-  .catch(error => {
-    console.error('Erreur :', error);
-  });
-
-
-async function afficherValeurDansCellule(celluleId,indice,indice2) {
-  const valeur = await accederAuJson(indice,indice2);
-
-  // Obtenez la référence de la cellule par son ID
-  const cellule = document.getElementById(celluleId);
-
-  // Assurez-vous que la cellule existe
-  if (cellule) {
-    // Affectez la valeur à la cellule
-      let nombre = valeur*100;
-      let nombre_arrondi = nombre.toFixed(2)
-      cellule.textContent = String(nombre_arrondi)+" %";
-  } else {
-      console.error("La cellule n'existe pas.");
-  }
-}
-*/
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
@@ -200,13 +104,27 @@ function proba_all(){
     chosen_team.forEach(function (button){
         index.push(change_bySpace(button.textContent))
     })
-    fetch('/proba_all', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({'team_to_remove': index })
-    })
+    let request = new XMLHttpRequest();
+    request.open('POST', '/proba_all', false);  // false indique une requête synchrone
+    request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    request.send(JSON.stringify(index));
+
+    if (request.status === 200) {
+        // Traitement des données si la requête est réussie
+        let responseData = JSON.parse(request.responseText);
+        let dict = responseData
+        for (let i = 0; i < Winners.length; i++) {
+            for (let j = 0; j < Runners_up.length; j++) {
+                let id = Runners_up[i] + " " + Winners[j]
+                let cell = document.getElementById(id)
+                console.log(runners_resultat[i]+winners_resultat[j] + ": "+dict[runners_resultat[i]][winners_resultat[j]])
+                cell.textContent = String(dict[runners_resultat[i]][winners_resultat[j]]) + "%"
+            }
+        }
+    } else {
+        // Gérer les erreurs ici
+        console.error('Erreur lors de la requête:', request.statusText);
+    }
 }
 function proba_hybride(){
     let index= []
@@ -571,6 +489,5 @@ for(let i=0; i<Runners_up.length; i++){
     table.appendChild(line)
 }
 //change_all()
-proba_hybride()
-verif_zero()
+proba_all()
 
