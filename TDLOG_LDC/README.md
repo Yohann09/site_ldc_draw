@@ -1,3 +1,0 @@
-# TDLOG_LDC
-
-Test
