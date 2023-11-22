@@ -6,6 +6,12 @@
     /*font-family: Arial, sans-serif;*/
 }
 
+/* pour le titre de la page */
+#mon-titre{
+    font-family: Cambria;
+    font-weight: lighter;
+}
+
 /* -------------------------- Affichage des boutons ------------------------ */
 
 #bouton-container {
@@ -29,12 +35,12 @@
     height: 3em;
 }
 
-.runner_up{
+.runner_up{ /* pour les boutons runner_up */
     background-color: #0097c0;
     border-radius: 5px;
     text-align: center;
     border: none;
-    padding: 15px;
+    padding: 10px;
     margin: 0.5%;
     color: #ececec;
     font-weight: bolder;
@@ -42,13 +48,13 @@
 .runner_up:hover{
     background-color: rgba(51, 162, 255, 0.82);
 }
-.winner{
+.winner{  /* pour les boutons winner */
     background-color: #d30d1f;
     border-radius: 5px;
     text-align: center;
     color: #ececec  ;
     border: none;
-    padding: 15px;
+    padding: 10px;
     margin: 0.5%;
     font-weight: bolder;
 }
@@ -65,7 +71,17 @@
     flex-direction: row;
     align-items: center;
     height: 3em;
-    margin: 2%;
+    margin-top: 1%;
+}
+#options_boutons{
+    order:1;
+}
+#options_boutons button{ /* pour modifier les propriétés des boutons options*/
+    border-radius: 5px;
+    border: none;
+    width: 5em; /* 2 fois la taille du "em" (unité relative) */
+    height: 2rem;
+    margin:3px;
 }
 
 #undo-name-section{
@@ -75,24 +91,26 @@
 
 #undo{
     background-color: #ffff3e;
-    order: 1;
-    border-radius: 5px;
+    /*border-radius: 5px;
     width: 5em;
     height: 3em;
     border-radius: 5px;
     border: none;
-    margin-left: 2.5em;
+    margin-left: 2.5em;*/
 }
 
 #restart-button{
-    background-color: #ff0000;
-    order: 1;
-    border-radius: 5px;
-    width: 5em;
-    height: 3em;
+    background-color: #2fff00;
+    /*border-radius: 5px;
+    width: 3em;
+    height: 2em;
     border-radius: 5px;
     border: none;
-    margin-left: 2.5em;
+    margin-left: 2.5em;*/
+}
+
+#heatmap-button{
+    background-color: greenyellow;
 }
 
 /* -------------------- Affichage des tableaux ------------------------- */
@@ -100,7 +118,7 @@
 #table-container{ /* Contenant des deux tableaux*/
     display : flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    /*flex-wrap: wrap;*/
     justify-content: space-around;
     align-items: center;
     font-size: 120%;

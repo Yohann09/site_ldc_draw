@@ -11,6 +11,7 @@
     <title>{% block title %} {% endblock %}</title>
   </head>
   <body>
+  <!---
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <a class="navbar-brand" href="{{ url_for('page_ucl')}}">UCL Draw</a>
         <a class="nav-link" href="{{ url_for('page_el') }}">EL Draw</a>
@@ -18,7 +19,7 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-    </nav>
+    </nav>--->
     <div id="container">
         {% block content %} {% endblock %}
     </div>

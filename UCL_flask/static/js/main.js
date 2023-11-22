@@ -11,98 +11,34 @@ if (xhr.status === 200) {
   resultat = JSON.parse(xhr.responseText);
   // Je peux maintenant utiliser myJSONData dans le reste du code
 } else {
-  console.error('Erreur de chargement du fichier JSON');
+  console.error('Erreur de chargement du fichier JSON resultat');
 }
-
-//console.log(resultat["('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')"]["Brugge, Napoli, Dortmund"])
-
 /*
-let jsonData = null;
+let xhr = new XMLHttpRequest();
+xhr.overrideMimeType("application/json");
+xhr.open("GET", "/static/resultat_hoy.json", false); // Notez-le "false" pour le mode synchrone
+xhr.send();
 
-async function fetchData() {
-  try {
-    const response = await fetch("/static/resultat.json");
-    jsonData = await response.json();
-  } catch (error) {
-    console.error('Erreur de chargement du fichier JSON :', error);
-  }
-}
+let resultat_hoy;
 
-async function main() {
-  if (jsonData === null) {
-    await fetchData();
-  }
-  return jsonData;
-}
-
-async function accederAuJson(indice,indice2) {
-  const resultat = await main();
-  const valeur = resultat[indice][indice2];
-  return valeur;
-}*/
-
-// Nouveau test
-/*
-function loadJSONFile(url, callback) {
-  let xhr = new XMLHttpRequest();
-  xhr.overrideMimeType("application/json");
-  xhr.open("GET", url, true);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      callback(JSON.parse(xhr.responseText));
-    }
-  };
-  xhr.send();
-}
-
-let myJSONData; // Variable pour stocker le JSON
-
-loadJSONFile("/static/resultat.json", function (data) {
-  myJSONData = data;
-  // Vous pouvez effectuer des opérations avec myJSONData ici
-    console.log(myJSONData)
-});
-console.log(myJSONData)*/
-// Test d'utilisation de la fonction accéder au JSON
-/*
-accederAuJson("('Liverpool', 'Brugge', 'Inter', 'Frankfurt', 'AC Milan', 'Leipzig', 'Dortmund', 'PSG'), ('Napoli', 'Porto', 'Bayern', 'Tottenham', 'Chelsea', 'Real Madrid', 'Manchester City', 'Benfica')", "Brugge, Napoli, Dortmund")
-  .then(valeur => {
-    console.log(valeur);
-  })
-  .catch(error => {
-    console.error('Erreur :', error);
-  });
-
-
-async function afficherValeurDansCellule(celluleId,indice,indice2) {
-  const valeur = await accederAuJson(indice,indice2);
-
-  // Obtenez la référence de la cellule par son ID
-  const cellule = document.getElementById(celluleId);
-
-  // Assurez-vous que la cellule existe
-  if (cellule) {
-    // Affectez la valeur à la cellule
-      let nombre = valeur*100;
-      let nombre_arrondi = nombre.toFixed(2)
-      cellule.textContent = String(nombre_arrondi)+" %";
-  } else {
-      console.error("La cellule n'existe pas.");
-  }
+if (xhr.status === 200) {
+  resultat_hoy = JSON.parse(xhr.responseText);
+  // Je peux maintenant utiliser myJSONData dans le reste du code
+} else {
+  console.error('Erreur de chargement du fichier JSON resultat');
 }
 */
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez l'élément h1 par son ID
     let monTitre = document.getElementById("mon-titre");
     // Modifiez le contenu du titre
-    monTitre.textContent = "Tirage";
+    monTitre.textContent = "Probabilités de tirage";
 });
 
 // Sélectionne le conteneur des boutons des équipes
-let boutonContainer = document.getElementById("bouton-container");
+let boutonContainer = document.getElementById("bouton-container"); // contient tous les boutons et titres de
+// sections en bas de page
 let buttonTeamContainer = document.createElement("div")
 buttonTeamContainer.id = "team-button"
 boutonContainer.appendChild(buttonTeamContainer)
@@ -180,12 +116,13 @@ function verif_zero(){
             let cell = document.getElementById(id)
             let content = cell.textContent
             let number = parseFloat(content.slice(0,-1))
-            if(number===0){
+            if(number===0){ // on grise ma cellule si la valeur est 0
                 cell.style.backgroundColor = "rgb(182,182,182)"
             }
         }
     }
-    let max_index;
+    let max_index;  // vérifie s'il y a des matchs et affichent
+    // les cases correspondantes en bleu en écrivant match
     if(chosen_team.length%2===0){max_index=chosen_team.length}
     else{max_index=chosen_team.length-1}
     for(let i=0;i<max_index/2;i++){
@@ -197,7 +134,8 @@ function verif_zero(){
 }
 
 function change_graphism(){
-    // Illumine la colonne en jaune
+    without_graphism()
+    // Illumine la ligne en jaune
     if(chosen_team.length%2===1){
         let last_team = chosen_team[chosen_team.length-1]
         let selecteur = "."+changeSpaceby_(last_team.textContent)
@@ -209,10 +147,12 @@ function change_graphism(){
             for(let i=0; i<chosen_team.length-1;i++){
                 let bouton = chosen_team[i]
                 let selecteur = "."+changeSpaceby_(bouton.textContent)
+                //console.log(selecteur)
                 let colorChange = document.querySelectorAll(selecteur)
                 let j=0
                 colorChange.forEach(function (element){
                     if(j>0){
+                        //console.log(element)
                         element.style.backgroundColor = "transparent"
                         element.textContent = "0.00%"
                     }else{
@@ -237,6 +177,17 @@ function change_graphism(){
                 }
                 i++
             })
+        }
+    }
+}
+
+// test reini graphiquement le tableau
+function without_graphism(){
+    for(let i=0;i<Winners.length;i++) {
+        for (let j = 0; j < Runners_up.length; j++) {
+            let id = Runners_up[i] + " " + Winners[j]
+            let cell = document.getElementById(id)
+            cell.style.backgroundColor = "transparent"
         }
     }
 }
@@ -338,12 +289,12 @@ function add_team_to_list_match(bouton){
     let index = list.indexOf(bouton)
     list.splice(index, 1)     // On enlève l'équipe des équipes à proposer
     affichage_winners = !affichage_winners  // on affiche les autres équipes
-    list.forEach(function(button){
+    list.forEach(function(button){  // Je fais disparaître toutes les autres boutons
         disappear_bouton(button)
     })
     other_list.forEach(function(button){
         // Si la proba du texte de ce button avec le dernier choisi: bouton est de 0 alors on n'affiche pas le button
-        // car le match ne peut pas avoir lieu et donc pas de calcul de proba
+        // car le match ne peut pas avoir lieu et donc pas de calcul de proba, sinon il y a un pb
         if(affichage_winners) {  // on vérifie que le bouton est un runner, dans ce cas on peut pas afficher tous les winners
             let cellule = document.getElementById(changeSpaceby_(bouton.textContent)+" "+changeSpaceby_(button.textContent))
             let proba = parseFloat(cellule.textContent)
@@ -389,18 +340,25 @@ for(let i=0; i<boutons_runner.length; i++) {
     })
 }
 
-// Touche pour revenir en arrière, enlever la dernière équipe ajoutée
+// Contient le nom de la section et le conteneur des boutons
 let optionsContainer = document.createElement("div")
 optionsContainer.id="options-container"
 boutonContainer.appendChild(optionsContainer)
+// Section qui contient les boutons des options
+let optionsButtonContainer = document.createElement("div")
+optionsButtonContainer.id="options_boutons"
+optionsContainer.appendChild(optionsButtonContainer)
+// bouton undo inclu dans le conteneur de boutons des options
 let undo_button = document.createElement("button")
 undo_button.id="undo"
 undo_button.textContent="Undo"
-optionsContainer.appendChild(undo_button)
+optionsButtonContainer.appendChild(undo_button)
+// Section qui contient le titre du optionsContainer
 let undoSection = document.createElement("p")
 undoSection.id ="undo-name-section"
 undoSection.textContent="Options: "
 optionsContainer.appendChild(undoSection)
+// Touche pour revenir en arrière, enlever la dernière équipe ajoutée
 undo_button.addEventListener("click", function(event){
     if(chosen_team.length !== 0){
         let last_team_chosen = chosen_team.pop()
@@ -433,7 +391,23 @@ undo_button.addEventListener("click", function(event){
         affichage_winners = !affichage_winners      // on rebascule sur l'affichage des autres teams
         boutons_winners.forEach(function(bouton){   // on change les modes d'affichage des boutons
             if(affichage_winners){
-                bouton.style.display="block"
+                // il faut que je rajoute une condition ici
+                // test si (proba(chosen_team[last],bouton) !== 0): on affiche le bouton sinon on le fait
+                let runner = chosen_team[chosen_team.length-1].textContent
+                let id = changeSpaceby_(runner)+" "+changeSpaceby_(bouton.textContent)
+                let cell = document.getElementById(id)
+                //console.log(cell.id)
+                let index = remove_from_list()
+                //console.log(index)
+                let index2 = give_index2(changeSpaceby_(bouton.textContent),changeSpaceby_(runner))
+                //console.log(index2)
+                if(cell){
+                    let nombre = resultat[index][index2]
+                    if(nombre!==0){
+                        bouton.style.display="block"
+                    }
+                }
+                else{console.log("la cellule n'existe pas")}
             }else{
                 disappear_bouton(bouton)
             }
@@ -460,29 +434,11 @@ undo_button.addEventListener("click", function(event){
 let restart_button = document.createElement("button")
 restart_button.id = "restart-button"
 restart_button.textContent = "Restart"
-undoSection.appendChild(restart_button)
+optionsButtonContainer.appendChild(restart_button)
 restart_button.addEventListener("click",function(event){
-    let chosen_team_name=[]
-    chosen_team.forEach(function(button){
-        chosen_team_name.push(button.textContent)
-    })
-    fetch('/proba', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({'liste': chosen_team_name})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.resultat) {
-                    console.log("Je suis dans la boucle")
-                    document.getElementById('restart-button').textContent = data.resultat;
-                    console.log("ID du truc")
-                } else {
-                    document.getElementById('restart-button').textContent = 'Erreur';
-                }
-            });
+    while(chosen_team.length>0){
+        undo_button.click()
+    }
 })
 
 // Rempli le tableau des probas

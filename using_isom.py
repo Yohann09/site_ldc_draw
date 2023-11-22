@@ -364,7 +364,7 @@ for team1 in winners:
                 and team1.rank() != team2.rank():
             G_init.add_edge(team1, team2)
 
-with open("static/isom.json", 'r') as fichier:
+with open("static/isom.json", 'r') as fichier:#open("UCL_flask/static/isom.json", 'r') as fichier:
     donnees = json.load(fichier)
 
 M = G_init.matrix(donnees)

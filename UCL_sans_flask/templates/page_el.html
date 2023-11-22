@@ -1,0 +1,33 @@
+{% extends 'base.html' %}  <!-- pour utiliser le modèle parent : base-->
+
+<!-- remplace le titre orginal qui était dans base-->
+{% block title %} EL Draw {% endblock %}
+
+{% block content %}
+    <h1>Test de choix d'une équipe</h1>
+    <form method="POST" action="/page_el">
+        <label for="choix">Choisissez une équipe :</label>
+        <select id="choix" name="choix">
+            {% for equipe in liste_equipe %}
+                <option value="{{ equipe }}">{{ equipe }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="choix2">Choisissez une deuxième équipe :</label>
+        <select>
+            {% for equipe2 in liste_equipe %}
+                <option velue="{{ equipe2 }}">{{ equipe2 }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Valider">
+    </form>
+    {% if equipe1 %}
+        <p>Équipe 1 sélectionnée : {{ equipe1 }}</p>
+    {% endif %}
+
+    {% if equipe2 %}
+        <p>Équipe 2 sélectionnée : {{ equipe2 }}</p>
+    {% endif %}
+{% endblock %}
+
+

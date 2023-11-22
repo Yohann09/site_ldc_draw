@@ -1,0 +1,26 @@
+{% extends 'base.html' %}  <!-- pour utiliser le modèle parent : base-->
+
+<!-- remplace le titre orginal qui était dans base-->
+{% block title %} Probabilités {% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style_table.css') }}">
+    <h1 id = "mon-titre">Probabilités de tirage </h1>
+    <div id="table-container">  <!-- section qui contient les deux tableaux-->
+        <table id="match-table">
+            <caption id="match-table-title">MATCHS</caption>
+        </table>
+        <div id="proba-container">
+            <table id="proba-table"></table>  <!-- On crée le tableau avec les probas dans main.js-->
+        </div>
+    </div>
+    <!-- tentative de création d'un tableau pour tout afficher-->
+    <!-- _____________ -->
+    <div id = "bouton-container">
+    </div>
+    <!-- ____________ -->
+    <footer id="footer">
+       <p id="mention">Developped by Akram Lamssyah, Bilel Benaich, Flavien Audibert and Yohann Canavese</p>
+   </footer>
+    <script src="{{ url_for('static', filename='js/main_hoy.js') }}"></script>
+{% endblock %}

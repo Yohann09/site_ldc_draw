@@ -1,0 +1,203 @@
+/* Toute la page */
+#container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /*font-family: Arial, sans-serif;*/
+}
+
+/* pour le titre de la page */
+#mon-titre{
+    font-family: Cambria;
+    font-weight: lighter;
+}
+
+/* -------------------------- Affichage des boutons ------------------------ */
+
+#bouton-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+#section-team-button{
+    font-weight: bolder;
+    font-size: 150%;
+}
+
+#team-button{
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    height: 3em;
+}
+
+.runner_up{ /* pour les boutons runner_up */
+    background-color: #0097c0;
+    border-radius: 5px;
+    text-align: center;
+    border: none;
+    padding: 15px;
+    margin: 0.5%;
+    color: #ececec;
+    font-weight: bolder;
+}
+.runner_up:hover{
+    background-color: rgba(51, 162, 255, 0.82);
+}
+.winner{  /* pour les boutons winner */
+    background-color: #d30d1f;
+    border-radius: 5px;
+    text-align: center;
+    color: #ececec  ;
+    border: none;
+    padding: 15px;
+    margin: 0.5%;
+    font-weight: bolder;
+}
+.winner:hover{
+    background-color: rgba(253, 58, 58, 0.82);
+}
+
+/* ----------------- Boutons des options ------------------ */
+
+#options-container{
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    height: 3em;
+    margin: 2%;
+}
+#options_boutons{
+    order:1;
+}
+#options_boutons button{ /* pour modifier les propriétés des boutons options*/
+    border-radius: 5px;
+    border: none;
+    width: 5em; /* 2 fois la taille du "em" (unité relative) */
+    height: 2rem;
+    margin:3px;
+}
+
+#undo-name-section{
+    font-weight: bolder;
+    font-size: 150%;
+}
+
+#undo{
+    background-color: #ffff3e;
+    /*border-radius: 5px;
+    width: 5em;
+    height: 3em;
+    border-radius: 5px;
+    border: none;
+    margin-left: 2.5em;*/
+}
+
+#restart-button{
+    background-color: #ff0000;
+    /*border-radius: 5px;
+    width: 3em;
+    height: 2em;
+    border-radius: 5px;
+    border: none;
+    margin-left: 2.5em;*/
+}
+
+#heatmap-button{
+    background-color: greenyellow;
+}
+
+/* -------------------- Affichage des tableaux ------------------------- */
+
+#table-container{ /* Contenant des deux tableaux*/
+    display : flex;
+    flex-direction: row;
+    /*flex-wrap: wrap;*/
+    justify-content: space-around;
+    align-items: center;
+    font-size: 120%;
+    color: rgba(0, 0, 0, 0.66);
+    font-family: "Times New Roman";
+    table-layout: fixed;
+    margin: 2%;
+    overflow: auto;
+
+}
+
+/* ---------------------- Affichage du tableau des probas --------------------------- --*/
+#proba-container {
+}
+
+#proba-table{
+    border : 1px solid #8c8888;
+        border-collapse: collapse;
+    text-align: center; /* Centrer horizontalement */
+    vertical-align: middle; /* Centrer verticalement */
+    border-radius: 8px;
+    margin-bottom: 1%;
+}
+
+.proba-cell{
+    padding: 3px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    height: 3em;
+    border-radius: 1px;
+}
+
+.cell-team{
+    font-weight: bolder;
+}
+
+.team-cell{
+    padding: 10px;
+}
+
+/* -------------------------- Affichage du tableau des matchs ----------------------- */
+
+#match-table{
+    border: 1px solid #8c8888;
+    order: 1;  /* Pour afficher le tableau de proba à gauche*/
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
+}
+
+.cell-match-table{
+    text-align: center;
+    width: 140px;
+    font-weight: lighter;
+}
+
+#match-table-title{
+    background-color: #4d97ea;
+    width: 100%;
+    text-align: center;
+    border-radius: 3px;
+    color: white
+}
+
+.cell-center{
+    text-align: center;
+}
+/* ---------------------  Affichage du pied de page ---------------------------------- */
+
+#footer{
+    background-color: lightgrey;
+    /*position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;*/
+    color: #484848;
+    order:1;
+    width:100%
+}

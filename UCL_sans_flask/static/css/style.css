@@ -1,0 +1,58 @@
+body {
+    background-image: url('image_stade.jpg');
+    background-size: cover; /* L'image de fond couvrira complètement la zone */
+    background-repeat: no-repeat; /* Empêche la répétition de l'image */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #0080ff;
+    text-align: center;
+    padding: 10px;
+}
+
+/*--- effet pour que l'image s'affiche quand on la survole
+      mais inutile maintenant qu elle prend toute la page*/
+.fade {
+  opacity: 0; /* L'image est initialement VISIBLE */
+  transition: opacity 4s; /* Animation de fondu de 4 secondes */
+}
+
+.fade:hover {
+  opacity: 1; /* L'image devient INVISIBLE au survol */
+}
+
+/* customisation des boutons*/
+.custom-button {
+    background-color: transparent; /* Couleur de fond du bouton */
+    color: #fff; /* Couleur du texte du bouton */
+    padding: 10px 20px; /* Espacement intérieur du bouton */
+    border: none; /* Supprime la bordure par défaut du bouton */
+    border-radius: 5px; /* Coins arrondis */
+    cursor: pointer; /* Curseur change au survol */
+    font-size: 150%; /* 1,5 fois la taille par défaut*/
+
+    display: flex;
+    margin: 0 auto; /* Centre horizontalement */
+    justify-content: center; /* Aligner horizontalement */
+    align-items: center; /*Aligner verticalement */
+    color: #ffffff;
+
+    /* Effets de survol */
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    /*test*/
+
+}
+
+.custom-button:hover {
+    background-color: #0056b3; /* Couleur de fond au survol */
+    color: #fff; /* Couleur du texte au survol */
+}
+
+custom-link{
+    text-decoration: none;
+    color: red;
+}

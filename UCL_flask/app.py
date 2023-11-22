@@ -198,4 +198,4 @@ def proba():
 
 # fonction pour lancer le site quand on exécute ce fichier
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=False,host='0.0.0.0')
