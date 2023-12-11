@@ -17,6 +17,8 @@ xhr.open("GET", "\C:\\Users\\yohan\\test_upload_site\\site_ldc_draw\\UCL_sans_fl
 //xhr.open("GET", "https://github.com/Yohann09/site_ldc_draw/blob/main/isom.json", false); // Notez-le "false" pour le mode synchrone
 xhr.send();
 
+
+
 let resultat;
 
 if (xhr.status === 200) {
